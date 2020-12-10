@@ -35,6 +35,7 @@ private:
     std::shared_ptr<ColorBuffer> colBuff;
     int renderedSamples = 0;
     bool needReset = false;
+    bool needSaveToFile = false;
 
     GLuint programId;
     GLuint bufferId;
@@ -51,6 +52,9 @@ private:
     bool renderStageCompleted = false;
 
     std::vector<std::shared_ptr<Scene>> scenes;
+    unsigned selectedScene = 2;
+    glm::vec3 backgroundColor;
+    char filename[30] = "image.ppm";
 };
 
 std::string const vsSrc = R".(

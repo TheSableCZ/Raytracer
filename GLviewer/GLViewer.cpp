@@ -12,7 +12,7 @@
 #include "../lib/imgui/imgui_impl_sdl.h"
 #include "../lib/imgui/imgui_impl_opengl3.h"
 
-GLViewer::GLViewer() {
+GLViewer::GLViewer() : backgroundColor(AppSettings::backgroundColor) {
     SDL_Init(SDL_INIT_EVERYTHING);
     window = SDL_CreateWindow("ogl",0,0, AppSettings::imgWidth, AppSettings::imgHeight, SDL_WINDOW_OPENGL);
 
@@ -74,12 +74,16 @@ void GLViewer::run() {
         if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
         if (ImGui::InputFloat("Distance to focus", &AppSettings::distToFocus, 1.f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
         if (ImGui::InputFloat("Aperture", &AppSettings::aperture, 0.1f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
+        bool ambient = AppSettings::backgroundColor != glm::vec3 (0.f);
+        if (ImGui::Checkbox("Ambient light", &ambient)) { AppSettings::backgroundColor = ambient ? backgroundColor : glm::vec3 (0.f); needReset = true; }
+        ImGui::InputText("", filename, 30); ImGui::SameLine();
+        if (ImGui::Button("Save")) { needSaveToFile = true; }
         if (ImGui::Button("Reset raytracing")) {
             needReset = true;
         }
         ImGui::End();
 
-        scenes[0]->gui(needReset);
+        scenes[selectedScene]->gui(needReset);
 
         ImGui::Render();
 
@@ -109,7 +113,7 @@ void GLViewer::initRaytracer() {
     colBuff = std::make_shared<ColorBuffer>(AppSettings::imgWidth, AppSettings::imgHeight);
 
     initScenes();
-    scenes[0]->createScene(raytracer->scene());
+    scenes[selectedScene]->createScene(raytracer->scene());
 
     workingThread = std::make_unique<std::thread>([this] { render(); });
 }
@@ -123,6 +127,14 @@ void GLViewer::render() {
             colBuff->clear();
             renderedSamples = 0;
             needReset = false;
+        }
+
+        if (needSaveToFile) {
+            colBuff->saveToPPM(
+                    filename,
+                    [this](const glm::vec3 &pixel) { return this->raytracer->pixelColorOperation(pixel, this->renderedSamples); }
+                    );
+            needSaveToFile = false;
         }
 
         renderStageCompleted = true;
@@ -168,6 +180,8 @@ void GLViewer::initGLObjects() {
 
 void GLViewer::initScenes() {
     scenes.emplace_back(std::make_shared<SimpleScene>());
+    scenes.emplace_back(std::make_shared<CornellBox>());
+    scenes.emplace_back(std::make_shared<MaterialScene>());
 }
 
 void GLViewer::updateBuffer() {

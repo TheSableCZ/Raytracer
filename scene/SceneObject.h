@@ -7,14 +7,11 @@
 
 #include "../common/Ray.h"
 #include "../common/Intersection.h"
-#include "../materials/Material.h"
 
 class SceneObject {
 public:
-    SceneObject(std::shared_ptr<Material> &mat) : material(mat) {}
+    SceneObject() = default;
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) = 0;
-
-    std::shared_ptr<Material> material;
 };
 
 #endif //RAYTRACER_SCENEOBJECT_H

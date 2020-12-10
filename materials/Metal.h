@@ -10,7 +10,7 @@
 
 class Metal : public Material {
 public:
-    Metal(glm::vec3 albedo, float fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz: 1) {}
+    Metal(glm::vec3 albedo, float fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
     bool scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation, Ray &scatteredRay) const override;
 
     glm::vec3 albedo;

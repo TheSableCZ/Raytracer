@@ -31,6 +31,7 @@ bool Sphere::intersect(const Ray &ray, float tMin, float tMax, Intersection &int
     //intersection.normal = intersection.frontFace ? intersection.normal : -intersection.normal;
 
     intersection.objectPtr = shared_from_this();
+    intersection.materialPtr = mat;
     //rec.set_face_normal(r, outward_normal);
     //get_sphere_uv(outward_normal, rec.u, rec.v);
     //rec.mat_ptr = mat_ptr;

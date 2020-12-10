@@ -25,7 +25,7 @@ public:
 
 private:
     SceneMgr sceneMgr;
-    Camera camera; //(AppSettings::lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, time0, time1)
+    //Camera camera; //(AppSettings::lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, time0, time1)
 };
 
 

@@ -9,6 +9,7 @@
 #include <memory>
 
 class SceneObject;
+class Material;
 
 struct Intersection {
     glm::vec3 point;
@@ -16,6 +17,7 @@ struct Intersection {
     float t;
     bool frontFace = true;
     std::shared_ptr<SceneObject> objectPtr;
+    std::shared_ptr<Material> materialPtr;
 
     void setFaceAndNormal(const glm::vec3 rayDirection, const glm::vec3 computedNormal) {
         frontFace = dot(rayDirection, computedNormal) < 0;

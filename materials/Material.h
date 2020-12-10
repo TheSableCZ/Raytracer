@@ -13,6 +13,7 @@ class Material {
 public:
     virtual glm::vec3 emitted(const Ray &ray) { return glm::vec3(0); }
     virtual bool scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation, Ray& scatteredRay) const = 0;
+    virtual bool scatterByColors() { return false; }
 };
 
 class SimpleMat : public Material {

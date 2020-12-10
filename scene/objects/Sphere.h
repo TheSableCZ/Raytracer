@@ -9,12 +9,13 @@
 
 class Sphere : public SceneObject, public std::enable_shared_from_this<Sphere> {
 public:
-    Sphere(glm::vec3 center, float radius, std::shared_ptr<Material> mat) : SceneObject(mat), center(center), radius(radius) {}
+    Sphere(glm::vec3 center, float radius, std::shared_ptr<Material> mat) : SceneObject(), center(center), radius(radius), mat(std::move(mat)) {}
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
 
 private:
     glm::vec3 center;
     float radius;
+    std::shared_ptr<Material> mat;
 };
 
 

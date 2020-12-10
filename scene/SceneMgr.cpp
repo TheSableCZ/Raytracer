@@ -5,7 +5,7 @@
 #include "SceneMgr.h"
 #include "../AppSettings.h"
 
-void SceneMgr::addSceneObject(std::shared_ptr<SceneObject> sceneObj) {
+void SceneMgr::addSceneObject(const std::shared_ptr<SceneObject>& sceneObj) {
     sceneObjs.emplace_back(sceneObj);
 }
 

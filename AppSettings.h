@@ -27,6 +27,10 @@ public:
     static float vfov;
     static float time0;
     static float time1;
+
+    // debug modes
+    static bool debug_showNormals;
+    static bool debug_showFrontSides;
 };
 
 #endif //RAYTRACER_APPSETTINGS_H

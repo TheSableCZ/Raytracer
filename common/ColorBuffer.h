@@ -14,15 +14,16 @@ struct ColorBuffer {
         p.resize(width * height);
     }
 
-    void saveToPPM() {
+    void saveToPPM(const char * filename, std::function<glm::vec3(const glm::vec3 &)> perPixelOp) {
         std::ofstream file;
-        file.open("image.ppm");
+        file.open(filename);
         file << "P3\n" << width << " " << height << "\n255\n";
         for (int j =  height - 1; j >= 0 ; j--)
         {
             for (int i = 0; i < width; ++i)
             {
-                file << int(255.99 * p[j*width + i].r) << " " << int(255.99 * p[j*width + i].g) << " " << int(255.99 * p[j*width + i].b) << "\n";
+                auto finalColor = perPixelOp(p[j*width + i]);
+                file << int(255.99 * finalColor.r) << " " << int(255.99 * finalColor.g) << " " << int(255.99 * finalColor.b) << "\n";
             }
         }
         file.close();
