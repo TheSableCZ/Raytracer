@@ -3,6 +3,9 @@
 //
 
 #include "Polygon.h"
+#include "../../AppSettings.h"
+#include "../../common/Random.h"
+#include <glm/gtx/norm.hpp>
 
 bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
     const float EPSILON = 0.0000001;
@@ -60,6 +63,30 @@ void Polygon::applyMatrixTransformation(glm::mat4 matrix) {
     p3 = glm::vec3 (tmp_4 / tmp_4.w);
 }
 
+float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+    Intersection intersection;
+    if (!this->intersect(Ray(origin, v), AppSettings::tMin, AppSettings::tMax, intersection))
+        return 0;
+
+    auto area = length(cross(p2-p1, p3-p1)) * 0.5; //(x1-x0)*(z1-z0);
+    auto distance_squared = intersection.t * intersection.t * length2(v);
+    auto cosine = fabs(dot(v, intersection.normal) / length(v));
+
+    return distance_squared / (cosine * area);
+}
+
+glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
+    auto a = randomFloat();
+    auto b = randomFloat();
+    if (a+b >= 1) {
+        a = 1-a;
+        b = 1-b;
+    }
+
+    auto randomPoint = p1 + a*(p2-p1) + b*(p3-p1);
+    return randomPoint - origin;
+}
+
 bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
     Intersection tempRec;
     auto intersect = false;
@@ -74,6 +101,25 @@ bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection
     }
 
     return intersect;
+}
+
+float PolygonMesh::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+    auto weight = 1.0/polygons.size();
+    auto sum = 0.0;
+
+    for (const auto &polygon : polygons)
+        sum += weight * polygon->pdfValue(origin, v);
+
+    return sum;
+}
+
+glm::vec3 PolygonMesh::randomDirection(const glm::vec3 &origin) const {
+    auto int_size = static_cast<int>(polygons.size());
+    if (int_size > 0) {
+        auto randIdx = randomInt(0, int_size - 1);
+        return polygons[randIdx]->randomDirection(origin);
+    }
+    return glm::vec3 (0.f);
 }
 
 std::shared_ptr<PolygonMesh> createRect(const std::shared_ptr<Material> &mat, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {

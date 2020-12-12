@@ -17,6 +17,7 @@ int AppSettings::imgHeight(600);
 int AppSettings::samplesPerPixel(10);
 bool AppSettings::antialiasing(true);
 bool AppSettings::useMC(true);
+bool AppSettings::lightsDirectSampling(true);
 
 //glm::vec3 AppSettings::lookfrom(-800, 350, 100);
 //glm::vec3 AppSettings::lookfrom(120, 800, 301);
@@ -36,3 +37,4 @@ float AppSettings::time1 = 1.0;
 
 bool AppSettings::debug_showNormals = false;
 bool AppSettings::debug_showFrontSides = false;
+bool AppSettings::debug_sampleOnlyLights = false;

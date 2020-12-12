@@ -79,6 +79,7 @@ void GLViewer::run() {
         ImGui::InputText("", filename, 30); ImGui::SameLine();
         if (ImGui::Button("Save")) { needSaveToFile = true; }
         if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
+        if (ImGui::Checkbox("Enable lights direct sampling", &AppSettings::lightsDirectSampling)) needReset = true;
         if (ImGui::Button("Reset raytracing")) {
             needReset = true;
         }

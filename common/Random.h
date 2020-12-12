@@ -22,6 +22,11 @@ inline glm::vec3 randomVec3(float min, float max) {
     return glm::vec3 (randomFloat(min, max), randomFloat(min, max), randomFloat(min, max));
 }
 
+inline int randomInt(int min, int max) {
+    // Returns a random integer in [min,max].
+    return static_cast<int>(randomFloat(min, max+0.9999));
+}
+
 inline glm::vec3 randomInUnitSphere() {
     while (true) {
         auto p = randomVec3(-1, 1);

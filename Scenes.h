@@ -109,9 +109,12 @@ class CornellBox : public Scene {
         //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1, 0), glm::vec3(0, 0, 0), white));
         //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 0, 1), glm::vec3(0, 0, 555), white));
 
+        auto lightObj = createRect(light, glm::vec3(213, 554, 227), glm::vec3(343, 554, 227), glm::vec3(343, 554, 332),glm::vec3(213, 554, 332));
+        lightObj->lightSource = true;
+        scene.addSceneObject(lightObj);
+
         scene.addSceneObject(createRect(green, glm::vec3(555, 0, 0), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(555, 555, 0)));
         scene.addSceneObject(createRect(red, glm::vec3(0, 0, 0), glm::vec3(0, 0, 555), glm::vec3(0, 555, 555),glm::vec3(0, 555, 0)));
-        scene.addSceneObject(createRect(light, glm::vec3(213, 554, 227), glm::vec3(343, 554, 227), glm::vec3(343, 554, 332),glm::vec3(213, 554, 332)));
         scene.addSceneObject(createRect(white, glm::vec3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(555, 0, 555),glm::vec3(0, 0, 555)));
         scene.addSceneObject(createRect(white, glm::vec3(0, 555, 0), glm::vec3(555, 555, 0), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
         scene.addSceneObject(createRect(white, glm::vec3(0, 0, 555), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
@@ -120,7 +123,7 @@ class CornellBox : public Scene {
         auto matrix = glm::scale(
                 glm::translate(
                         glm::rotate(glm::mat4(1.f), glm::radians(23.f), glm::vec3(0.f, 1.f, 0.f)),
-                        glm::vec3(265,200,300)),
+                        glm::vec3(265,200,300)), /*glm::vec3(265,200,450)),*/
                 glm::vec3(165, 400, 165)
         );
         box->applyMatrixTransformation(matrix);
@@ -150,13 +153,15 @@ class MaterialScene : public Scene {
         auto light = std::make_shared<SimpleMat>(glm::vec3(15, 15, 15));
         auto glass = std::make_shared<Dielectric>(1.5);
         //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1.f, 0.2f, 0.1f));
-        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
-        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(1, 1, 1), 6.f);
+        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(1, 1, 1), 6.f);
         auto white2 = std::make_shared<Lambertian>(glm::vec3(1, 1, 1));
 
-        //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0), red));
-        scene.addSceneObject(createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),
-                                        glm::vec3(-10, 20, 5)));
+        scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0), white));
+        auto lightObj = createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),
+                                   glm::vec3(-10, 20, 5));
+        lightObj->lightSource = true;
+        scene.addSceneObject(lightObj);
 
         //scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(-10, 5, 0), 5, glass));
         scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(10, 5, 0), 5, bssrdf));

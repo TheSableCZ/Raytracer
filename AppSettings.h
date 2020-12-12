@@ -18,6 +18,7 @@ public:
     static int samplesPerPixel;
     static bool antialiasing;
     static bool useMC;
+    static bool lightsDirectSampling;
 
     // default camera
     static glm::vec3 lookfrom;
@@ -32,6 +33,7 @@ public:
     // debug modes
     static bool debug_showNormals;
     static bool debug_showFrontSides;
+    static bool debug_sampleOnlyLights;
 };
 
 #endif //RAYTRACER_APPSETTINGS_H

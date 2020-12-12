@@ -41,6 +41,7 @@ glm::vec3 Raytracer::trace(const Ray &ray, int depth) {
         return tmpColor;
     } else {
         ScatterInfo scatterInfo;
+        scatterInfo.colorChannel = ray.colorComponent;
         if (intersection.materialPtr->scatter(ray, intersection, scatterInfo))
             //return attenuation * trace(scatteredRay, depth - 1);
             return calculateScatteredRay(ray, intersection, scatterInfo, depth);
@@ -57,8 +58,29 @@ Raytracer::calculateScatteredRay(const Ray &inRay, const Intersection &intersect
     if (scatterInfo.useMC) {
         //auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
         //mixture_pdf p(light_ptr, srec.pdf_ptr);
-        Ray scattered = Ray(scatterInfo.rayOrigin, scatterInfo.pdfPtr->generate()); //ray(rec.p, p.generate(), r.time());
-        auto pdfValue = scatterInfo.pdfPtr->value(scattered.direction); //p.value(scattered.direction());
+        //auto p = scatterInfo.pdfPtr;
+        //auto p = scene().getLightPdf(scatterInfo.rayOrigin);
+        std::shared_ptr<Pdf> p;
+        if (AppSettings::lightsDirectSampling && scene().lightSourcesCount() > 0
+                && scatterInfo.scatteredRayType != ScatteredRayType::BSSRDF_enteringMedium
+                && scatterInfo.scatteredRayType != ScatteredRayType::BSSRDF_insideMedium
+                )
+        {
+            p = std::make_shared<MixturePdf>(scatterInfo.pdfPtr, scene().getLightPdf(scatterInfo.rayOrigin));
+        } else {
+            p = scatterInfo.pdfPtr;
+        }
+
+#ifndef NDEBUG
+        if (AppSettings::debug_sampleOnlyLights) {
+            p = scene().getLightPdf(scatterInfo.rayOrigin);
+        }
+#endif
+
+        Ray scattered = Ray(scatterInfo.rayOrigin, p->generate()); //ray(rec.p, p.generate(), r.time());
+        auto pdfValue = p->value(scattered.direction); //p.value(scattered.direction());
+
+        scattered.colorComponent = scatterInfo.colorChannel;
 
         return scatterInfo.attenuation * intersection.materialPtr->scatteringPdf(inRay, intersection, scattered, scatterInfo)
                * trace(scattered, depth-1)
@@ -105,6 +127,7 @@ void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
 
 glm::vec3 Raytracer::pixelColorOperation(glm::vec3 pixelColor, int samplesPerPixel) {
     auto scale = 1.f / static_cast<float>(samplesPerPixel);
+    pixelColor = deNan(pixelColor);
     return clampColorWithRatio(glm::vec3(sqrt(pixelColor.r * scale), sqrt(pixelColor.g * scale), sqrt(pixelColor.b * scale)));
 }
 

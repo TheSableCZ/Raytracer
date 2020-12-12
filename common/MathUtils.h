@@ -20,4 +20,15 @@ inline glm::vec3 clampColorWithRatio(glm::vec3 vec) {
     return vec;
 }
 
+inline glm::vec3 deNan(glm::vec3 color) {
+    if (color.r != color.r)
+        color.r = 0.0;
+    if (color.g != color.g)
+        color.g = 0.0;
+    if (color.b != color.b)
+        color.b = 0.0;
+
+    return color;
+}
+
 #endif //RAYTRACER_MATHUTILS_H

@@ -49,7 +49,7 @@ bool BSSRDF::scatter(const Ray &inRay, const Intersection &intersection, Scatter
         //        normalize(calculateRandomDirectionInHemisphere(-intersection.normal)) //-intersection.normal + randomUnitVector()
         //        );
         scatteredRayType = ScatteredRayType::BSSRDF_enteringMedium;
-        //attenuation = albedo;
+        attenuation = albedo;
         //scatteredRay.colorComponent = colorComponent;
         //return true;
     } else {
@@ -62,7 +62,7 @@ bool BSSRDF::scatter(const Ray &inRay, const Intersection &intersection, Scatter
             //        normalize(calculateRandomDirectionInHemisphere(-intersection.normal)) //-intersection.normal + randomUnitVector()
             //        );
             scatteredRayType = ScatteredRayType::BSSRDF_exitingMedium;
-            //attenuation = _attenuation;
+            attenuation = _attenuation;
             //scatteredRay.colorComponent = colorComponent;
             //return true;
             //ray.origin = getPointOnRay(ray, intrT + .0002f);
@@ -75,7 +75,7 @@ bool BSSRDF::scatter(const Ray &inRay, const Intersection &intersection, Scatter
             //        -normalize(calculateRandomDirectionInHemisphere(inRay.direction)) //-(inRay.direction + randomUnitVector())
             //        );
             scatteredRayType = ScatteredRayType::BSSRDF_insideMedium;
-            //attenuation = _attenuation;
+            attenuation = _attenuation;
             //scatteredRay.colorComponent = colorComponent;
             //return true;
             //ray.origin = getPointOnRay(ray, so);
@@ -83,8 +83,7 @@ bool BSSRDF::scatter(const Ray &inRay, const Intersection &intersection, Scatter
         }
     }
 
-    attenuation = albedo;
-    scatteredRay.colorComponent = colorComponent;
+    //attenuation = albedo;
 
     if (!AppSettings::useMC) {
         if (scatteredRayType == ScatteredRayType::BSSRDF_insideMedium) {
@@ -100,8 +99,10 @@ bool BSSRDF::scatter(const Ray &inRay, const Intersection &intersection, Scatter
                             -intersection.normal)) //-intersection.normal + randomUnitVector()
             );
         }
+        scatteredRay.colorComponent = colorComponent;
     } else {
         scatterInfo.useMC = true;
+        scatterInfo.colorChannel = colorComponent;
 
         if (scatteredRayType == ScatteredRayType::BSSRDF_insideMedium) {
             scatterInfo.pdfPtr = std::make_shared<MinusCosinePdf>(inRay.direction);

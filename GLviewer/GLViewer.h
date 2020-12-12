@@ -52,7 +52,7 @@ private:
     bool renderStageCompleted = false;
 
     std::vector<std::shared_ptr<Scene>> scenes;
-    unsigned selectedScene = 1;
+    unsigned selectedScene = 2;
     glm::vec3 backgroundColor;
     char filename[30] = "image.ppm";
 };
