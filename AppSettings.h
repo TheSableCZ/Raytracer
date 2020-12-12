@@ -27,8 +27,6 @@ public:
     static float distToFocus;
     static float aperture;
     static float vfov;
-    static float time0;
-    static float time1;
 
     // debug modes
     static bool debug_showNormals;

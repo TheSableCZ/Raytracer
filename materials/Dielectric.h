@@ -11,7 +11,7 @@
 class Dielectric : public Material {
 public:
     Dielectric(float indexOfRefraction) : ir(indexOfRefraction) {}
-    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const override;
+    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo, int colorChannel) const override;
 
 private:
     float ir;
@@ -24,7 +24,8 @@ private:
     }
 };
 
-bool Dielectric::scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const {
+bool Dielectric::scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo,
+                         int colorChannel) const {
     scatterInfo.attenuation = glm::vec3 (1.0, 1.0, 1.0);
     auto refraction_ratio = intersection.frontFace ? (1.f/ir) : ir;
 

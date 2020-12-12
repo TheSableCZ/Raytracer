@@ -39,10 +39,6 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
 
         intersection.setFaceAndNormal(ray.direction, normalize(cross(edge1, edge2)));
 
-        //intersection.normal = normalize(cross(edge1, edge2));
-        //intersection.frontFace = dot(ray.direction, intersection.normal) < 0;
-        //intersection.normal = intersection.frontFace ? intersection.normal : -intersection.normal;
-
         intersection.objectPtr = shared_from_this();
         intersection.materialPtr = mat;
         return true;

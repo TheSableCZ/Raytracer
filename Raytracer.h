@@ -15,20 +15,19 @@
 class Raytracer {
 public:
     Raytracer();
-    glm::vec3 trace(const Ray &ray, int depth);
-    glm::vec3 calculateScatteredRay(const Ray &inRay, const Intersection &intersection, const ScatterInfo &scatterInfo,
-                                    int depth);
-    void render(ColorBuffer &colorBuffer, int width, int height);
+    glm::vec3 trace(const Ray &ray, int depth, int colorChannel);
+    inline glm::vec3 calculateScatteredRay(const Ray &inRay, const Intersection &intersection, const ScatterInfo &scatterInfo,
+                                    int depth, int colorChannel = -1);
     void renderStage(ColorBuffer &colorBuffer, int width, int height);
     static glm::vec3 pixelColorOperation(glm::vec3 pixelColor, int samplesPerPixel);
 
     void initCameraWithAppSettings();
 
     SceneMgr& scene() { return sceneMgr; }
+    void clearScene() { sceneMgr = SceneMgr(); sceneMgr.camera().init(); }
 
 private:
     SceneMgr sceneMgr;
-    //Camera camera; //(AppSettings::lookfrom, lookat, vup, vfov, aspect_ratio, aperture, dist_to_focus, time0, time1)
 };
 
 

@@ -12,7 +12,8 @@
 class Material {
 public:
     virtual glm::vec3 emitted(const Ray &ray) { return glm::vec3(0); }
-    virtual bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const = 0;
+    virtual bool
+    scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo, int colorChannel) const = 0;
     virtual bool scatterByColors() { return false; }
     virtual float scatteringPdf(const Ray &inRay, const Intersection &intersection, const Ray &scatteredRay,
                                 const ScatterInfo &scatterInfo) const {
@@ -24,7 +25,7 @@ class SimpleMat : public Material {
 public:
     SimpleMat(glm::vec3 color) : color(color) {}
     glm::vec3 emitted(const Ray &ray) override { return color; }
-    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const override {
+    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo, int colorChannel) const override {
         return false;
     }
 

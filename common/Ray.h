@@ -13,7 +13,6 @@ struct Ray {
     glm::vec3 at(float t) const { return origin + t*direction; }
     glm::vec3 origin;
     glm::vec3 direction;
-    int colorComponent = -1;
 };
 
 

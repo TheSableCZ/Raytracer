@@ -3,7 +3,6 @@
 //
 
 #include "GLViewer.h"
-#include "../AppSettings.h"
 #include "../Scenes.h"
 #include "Utils.h"
 #include <iostream>
@@ -44,11 +43,8 @@ GLViewer::GLViewer() : backgroundColor(AppSettings::backgroundColor) {
 }
 
 void GLViewer::run() {
-    //running = true;
 
     glClearColor(0,1,0,1);
-
-    bool show_demo_window = true;
 
     SDL_Event event;
     while(running){
@@ -64,8 +60,6 @@ void GLViewer::run() {
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
 
-        //raytracer->renderStage(*colBuff, AppSettings::imgWidth, AppSettings::imgHeight);
-        //renderedSamples++;
         updateBuffer();
 
         ImGui::Begin("Raytracer");
@@ -80,6 +74,10 @@ void GLViewer::run() {
         if (ImGui::Button("Save")) { needSaveToFile = true; }
         if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
         if (ImGui::Checkbox("Enable lights direct sampling", &AppSettings::lightsDirectSampling)) needReset = true;
+        if (ImGui::Button("Next scene")) {
+            selectedScene = (selectedScene + 1) % (scenes.size());
+        }
+        ImGui::SameLine();
         if (ImGui::Button("Reset raytracing")) {
             needReset = true;
         }
@@ -115,15 +113,22 @@ void GLViewer::initRaytracer() {
     colBuff = std::make_shared<ColorBuffer>(AppSettings::imgWidth, AppSettings::imgHeight);
 
     initScenes();
-    scenes[selectedScene]->createScene(raytracer->scene());
+    initSelectedScene();
 
     workingThread = std::make_unique<std::thread>([this] { render(); });
 }
 
 void GLViewer::render() {
     while (true) {
+        unsigned _selectedScene = selectedScene;
+
         raytracer->renderStage(*colBuff, AppSettings::imgWidth, AppSettings::imgHeight);
         renderedSamples++;
+
+        if (_selectedScene != selectedScene) {
+            initSelectedScene();
+            needReset = true;
+        }
 
         if (needReset) {
             colBuff->clear();
@@ -155,14 +160,6 @@ void GLViewer::initGLObjects() {
             createShader(GL_FRAGMENT_SHADER, fsSrc)
             );
 
-    /*glGenBuffers(1, &bufferId);
-    //glNamedBufferData(bufferId, colBuff->size() * 3 * sizeof(float), NULL, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-    glBufferData(GL_ARRAY_BUFFER, colBuff->size() * 3 * sizeof(float), NULL, GL_STREAM_DRAW);*/
-
-    //widthUniform = glGetUniformLocation(programId, "width");
-    //heightUniform = glGetUniformLocation(programId, "height");
-
     glGenTextures(1, &textureId);
     glBindTexture(GL_TEXTURE_2D, textureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -173,17 +170,14 @@ void GLViewer::initGLObjects() {
     texUniform = glGetUniformLocation(programId, "tex");
 
     glGenVertexArrays(1, &vao);
-
-    // testtest
-    //raytracer->renderStage(*colBuff, AppSettings::imgWidth, AppSettings::imgHeight);
-    //renderedSamples++;
-    //updateBuffer();
 }
 
 void GLViewer::initScenes() {
-    scenes.emplace_back(std::make_shared<SimpleScene>());
+    //scenes.emplace_back(std::make_shared<SimpleScene>());
     scenes.emplace_back(std::make_shared<CornellBox>());
+    scenes.emplace_back(std::make_shared<CornellBox2>());
     scenes.emplace_back(std::make_shared<MaterialScene>());
+    scenes.emplace_back(std::make_shared<BlenderTest>());
 }
 
 void GLViewer::updateBuffer() {
@@ -199,50 +193,10 @@ void GLViewer::updateBuffer() {
         std::lock_guard<std::mutex> lk(m);
         cv.notify_one();
     }
-
-    /*SDL_Surface* surface = SDL_LoadBMP("tiles.bmp");
-    if (surface == NULL) throw std::exception();
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT,4);
-    if(     (surface->format->Rmask == 0xff0000) &&
-            (surface->format->Gmask == 0xff00) &&
-            (surface->format->Bmask == 0xff) &&
-            (surface->format->Amask == 0))
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surface->pixels);
-    }
-    else if((surface->format->Rmask == 0xff) &&
-            (surface->format->Gmask == 0xff00) &&
-            (surface->format->Bmask == 0xff0000) &&
-            (surface->format->Amask == 0))
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-    }*/
-
-
-
-    /*float *buffer = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    for (int i = 0; i < colBuff->size(); i++) {
-        auto pixelColor = raytracer->pixelColorOperation(colBuff->p[i], renderedSamples);
-        //std::cout << pixelColor.r << ", " << pixelColor.g << ", " << pixelColor.b << std::endl;
-        buffer[(i*3)  ] = pixelColor.r;
-        buffer[(i*3)+1] = pixelColor.g;
-        buffer[(i*3)+2] = pixelColor.b;
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);*/
-
-    /*buffer = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-    for (int i = 0; i < 3; i++) {
-        std::cout << buffer[i] << std::endl;
-    }
-    glUnmapBuffer(GL_ARRAY_BUFFER);*/
 }
 
 void GLViewer::draw() {
     glUseProgram(programId);
-
-    //glUniform1i(widthUniform, colBuff->width);
-    //glUniform1i(heightUniform, colBuff->height);
 
     // Texture 0
     glActiveTexture(GL_TEXTURE0);
@@ -250,9 +204,6 @@ void GLViewer::draw() {
     glUniform1i(texUniform, 0);
 
     glBindVertexArray(vao);
-    //glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-    //glEnableVertexAttribArray(0);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -276,4 +227,9 @@ std::vector<unsigned char> GLViewer::pixelsToTextureData() const {
 
 GLViewer::~GLViewer() {
     workingThread->join();
+}
+
+void GLViewer::initSelectedScene() {
+    raytracer->clearScene();
+    scenes[selectedScene]->createScene(raytracer->scene());
 }

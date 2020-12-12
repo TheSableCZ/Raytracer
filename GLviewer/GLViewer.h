@@ -20,6 +20,7 @@ public:
     void initRaytracer();
     void initGLObjects();
     void initScenes();
+    void initSelectedScene();
     void updateBuffer();
     void draw();
 
@@ -40,8 +41,6 @@ private:
     GLuint programId;
     GLuint bufferId;
     GLuint textureId;
-    GLint widthUniform;
-    GLint heightUniform;
     GLuint vao;
     GLuint texUniform;
 
@@ -52,7 +51,7 @@ private:
     bool renderStageCompleted = false;
 
     std::vector<std::shared_ptr<Scene>> scenes;
-    unsigned selectedScene = 2;
+    unsigned selectedScene = 0;
     glm::vec3 backgroundColor;
     char filename[30] = "image.ppm";
 };

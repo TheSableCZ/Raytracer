@@ -23,7 +23,6 @@ struct ScatterInfo {
     glm::vec3 rayOrigin;
 
     ScatteredRayType scatteredRayType = ScatteredRayType::none;
-    int colorChannel = -1;
 };
 
 #endif //RAYTRACER_SCATTERINFO_H
