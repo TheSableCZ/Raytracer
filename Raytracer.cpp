@@ -32,24 +32,40 @@ glm::vec3 Raytracer::trace(const Ray &ray, int depth) {
         for (int i = 0; i < 3; i++) {
             Ray rayCopy = ray;
             rayCopy.colorComponent = i;
-            glm::vec3 attenuation;
-            Ray scatteredRay;
-            if (intersection.materialPtr->scatter(rayCopy, intersection, attenuation, scatteredRay)) {
-                glm::vec3 result = attenuation * trace(scatteredRay, depth - 1);
-                tmpColor += result;
+            ScatterInfo scatterInfo;
+            if (intersection.materialPtr->scatter(rayCopy, intersection, scatterInfo)) {
+                //glm::vec3 result = attenuation * trace(scatteredRay, depth - 1);
+                tmpColor += calculateScatteredRay(rayCopy, intersection, scatterInfo, depth);
             }
         }
         return tmpColor;
     } else {
-        glm::vec3 attenuation;
-        Ray scatteredRay;
-        if (intersection.materialPtr->scatter(ray, intersection, attenuation, scatteredRay))
-            return attenuation * trace(scatteredRay, depth - 1);
+        ScatterInfo scatterInfo;
+        if (intersection.materialPtr->scatter(ray, intersection, scatterInfo))
+            //return attenuation * trace(scatteredRay, depth - 1);
+            return calculateScatteredRay(ray, intersection, scatterInfo, depth);
     }
 
     // zatím jenom jednoduché vrácení emitované barvy
     return intersection.materialPtr->emitted(ray);
     //return intersection.normal;
+}
+
+glm::vec3
+Raytracer::calculateScatteredRay(const Ray &inRay, const Intersection &intersection, const ScatterInfo &scatterInfo,
+                                 int depth) {
+    if (scatterInfo.useMC) {
+        //auto light_ptr = make_shared<hittable_pdf>(lights, rec.p);
+        //mixture_pdf p(light_ptr, srec.pdf_ptr);
+        Ray scattered = Ray(scatterInfo.rayOrigin, scatterInfo.pdfPtr->generate()); //ray(rec.p, p.generate(), r.time());
+        auto pdfValue = scatterInfo.pdfPtr->value(scattered.direction); //p.value(scattered.direction());
+
+        return scatterInfo.attenuation * intersection.materialPtr->scatteringPdf(inRay, intersection, scattered, scatterInfo)
+               * trace(scattered, depth-1)
+               / pdfValue;
+    } else {
+        return scatterInfo.attenuation * trace(scatterInfo.scatteredRay, depth - 1);
+    }
 }
 
 void Raytracer::render(ColorBuffer &colorBuffer, int width, int height) {
@@ -81,7 +97,7 @@ void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
                 v = static_cast<float>(j) / static_cast<float>(height - 1);
             }
             Ray r = scene().camera().getRay(u, v);
-            auto resultColor = clampColorWithRatio(trace(r, AppSettings::maxDepth));
+            auto resultColor = trace(r, AppSettings::maxDepth);
             colorBuffer.p[(j * width) + i] += resultColor;
         }
     }
@@ -89,7 +105,7 @@ void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
 
 glm::vec3 Raytracer::pixelColorOperation(glm::vec3 pixelColor, int samplesPerPixel) {
     auto scale = 1.f / static_cast<float>(samplesPerPixel);
-    return glm::vec3(sqrt(pixelColor.r * scale), sqrt(pixelColor.g * scale), sqrt(pixelColor.b * scale));
+    return clampColorWithRatio(glm::vec3(sqrt(pixelColor.r * scale), sqrt(pixelColor.g * scale), sqrt(pixelColor.b * scale)));
 }
 
 void Raytracer::initCameraWithAppSettings() {

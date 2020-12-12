@@ -10,11 +10,14 @@
 #include "scene/SceneMgr.h"
 #include "common/ColorBuffer.h"
 #include "common/Camera.h"
+#include "common/ScatterInfo.h"
 
 class Raytracer {
 public:
     Raytracer();
     glm::vec3 trace(const Ray &ray, int depth);
+    glm::vec3 calculateScatteredRay(const Ray &inRay, const Intersection &intersection, const ScatterInfo &scatterInfo,
+                                    int depth);
     void render(ColorBuffer &colorBuffer, int width, int height);
     void renderStage(ColorBuffer &colorBuffer, int width, int height);
     static glm::vec3 pixelColorOperation(glm::vec3 pixelColor, int samplesPerPixel);

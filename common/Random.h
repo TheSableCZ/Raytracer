@@ -42,4 +42,44 @@ inline glm::vec3 randomInUnitDisk() {
     }
 }
 
+#define TWO_PI            6.2831853071795864769252867665590057683943f
+#define SQRT_OF_ONE_THIRD 0.5773502691896257645091487805019574556476f
+
+/**
+ * Computes a cosine-weighted random direction in a hemisphere.
+ * Used for diffuse lighting.
+ *
+ * Copied from https://github.com/zammiez/Project3-CUDA-Path-Tracer
+ */
+inline glm::vec3 calculateRandomDirectionInHemisphere(glm::vec3 normal) {
+
+    float up = sqrt(randomFloat()); // cos(theta)
+    float over = sqrt(1 - up * up); // sin(theta)
+    float around = randomFloat() * TWO_PI;
+
+    // Find a direction that is not the normal based off of whether or not the
+    // normal's components are all equal to sqrt(1/3) or whether or not at
+    // least one component is less than sqrt(1/3). Learned this trick from
+    // Peter Kutz.
+
+    glm::vec3 directionNotNormal;
+    if (abs(normal.x) < SQRT_OF_ONE_THIRD) {
+        directionNotNormal = glm::vec3(1, 0, 0);
+    } else if (abs(normal.y) < SQRT_OF_ONE_THIRD) {
+        directionNotNormal = glm::vec3(0, 1, 0);
+    } else {
+        directionNotNormal = glm::vec3(0, 0, 1);
+    }
+
+    // Use not-normal direction to generate two perpendicular directions
+    glm::vec3 perpendicularDirection1 =
+            glm::normalize(glm::cross(normal, directionNotNormal));
+    glm::vec3 perpendicularDirection2 =
+            glm::normalize(glm::cross(normal, perpendicularDirection1));
+
+    return up * normal
+           + cos(around) * over * perpendicularDirection1
+           + sin(around) * over * perpendicularDirection2;
+}
+
 #endif //RAYTRACER_RANDOM_H

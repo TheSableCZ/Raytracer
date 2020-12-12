@@ -12,15 +12,19 @@
 class Material {
 public:
     virtual glm::vec3 emitted(const Ray &ray) { return glm::vec3(0); }
-    virtual bool scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation, Ray& scatteredRay) const = 0;
+    virtual bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const = 0;
     virtual bool scatterByColors() { return false; }
+    virtual float scatteringPdf(const Ray &inRay, const Intersection &intersection, const Ray &scatteredRay,
+                                const ScatterInfo &scatterInfo) const {
+        return 0;
+    }
 };
 
 class SimpleMat : public Material {
 public:
     SimpleMat(glm::vec3 color) : color(color) {}
     glm::vec3 emitted(const Ray &ray) override { return color; }
-    bool scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation, Ray &scatteredRay) const override {
+    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const override {
         return false;
     }
 

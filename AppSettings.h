@@ -17,6 +17,7 @@ public:
     static int imgHeight;
     static int samplesPerPixel;
     static bool antialiasing;
+    static bool useMC;
 
     // default camera
     static glm::vec3 lookfrom;

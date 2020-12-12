@@ -68,7 +68,7 @@ void GLViewer::run() {
         //renderedSamples++;
         updateBuffer();
 
-        ImGui::Begin("Raytracer");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Raytracer");
         ImGui::Text("Current samples per pixel = %d", renderedSamples);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
@@ -78,6 +78,7 @@ void GLViewer::run() {
         if (ImGui::Checkbox("Ambient light", &ambient)) { AppSettings::backgroundColor = ambient ? backgroundColor : glm::vec3 (0.f); needReset = true; }
         ImGui::InputText("", filename, 30); ImGui::SameLine();
         if (ImGui::Button("Save")) { needSaveToFile = true; }
+        if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
         if (ImGui::Button("Reset raytracing")) {
             needReset = true;
         }

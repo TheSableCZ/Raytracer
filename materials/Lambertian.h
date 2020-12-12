@@ -12,22 +12,40 @@
 class Lambertian : public Material {
 public:
     explicit Lambertian(const glm::vec3 color) : albedo(color) {}
-    bool scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation, Ray &scatteredRay) const override;
+    bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const override;
+    float scatteringPdf(const Ray &inRay, const Intersection &intersection, const Ray &scatteredRay,
+                        const ScatterInfo &scatterInfo) const override;
 
     glm::vec3 albedo;
 };
 
-bool Lambertian::scatter(const Ray &inRay, const Intersection &intersection, glm::vec3 &attenuation,
-                         Ray &scatteredRay) const {
-    auto scatter_direction = intersection.normal + randomUnitVector();
+bool Lambertian::scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo) const {
+    if (!AppSettings::useMC) {
+        //auto scatter_direction = intersection.normal + randomUnitVector();
+        auto scatter_direction = calculateRandomDirectionInHemisphere(intersection.normal);
 
-    // Catch degenerate scatter direction
-    if (nearZero(scatter_direction))
-        scatter_direction = intersection.normal;
+        // Catch degenerate scatter direction
+        if (nearZero(scatter_direction))
+            scatter_direction = intersection.normal;
 
-    scatteredRay = Ray(intersection.point, scatter_direction);
-    attenuation = albedo;
-    return true;
+        scatterInfo.scatteredRay = Ray(intersection.point, scatter_direction);
+        scatterInfo.attenuation = albedo;
+        return true;
+    } else {
+        scatterInfo.attenuation = albedo;
+        scatterInfo.pdfPtr = std::make_shared<CosinePdf>(intersection.normal);
+        scatterInfo.rayOrigin = intersection.point;
+        scatterInfo.useMC = true;
+        return true;
+    }
+}
+
+float Lambertian::scatteringPdf(const Ray &inRay, const Intersection &intersection, const Ray &scatteredRay,
+                                const ScatterInfo &scatterInfo) const {
+    //auto cosine = dot(rec.normal, unit_vector(scattered.direction()));
+    //return cosine < 0 ? 0 : cosine/pi;
+    auto cosine = dot(normalize(scatteredRay.direction), intersection.normal);
+    return (cosine <= 0) ? 0 : cosine/static_cast<float>(M_PI);
 }
 
 #endif //RAYTRACER_LAMBERTIAN_H
