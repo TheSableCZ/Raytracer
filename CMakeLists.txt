@@ -31,6 +31,16 @@ set(IMGUI
         lib/imgui/imgui_impl_sdl.h
         )
 
-add_executable(${PROJECT_NAME} ${IMGUI} main.cpp Raytracer.cpp Raytracer.h common/Ray.h scene/SceneMgr.cpp scene/SceneMgr.h scene/SceneObject.h common/Intersection.h AppSettings.h materials/Material.h common/ColorBuffer.h common/Random.h common/Camera.cpp common/Camera.h AppSettings.cpp scene/objects/Sphere.cpp scene/objects/Sphere.h scene/objects/Polygon.cpp scene/objects/Polygon.h materials/Metal.h GLviewer/GLViewer.cpp GLviewer/GLViewer.h GLviewer/Utils.h Scenes.h materials/Dielectric.h scene/objects/Plane.cpp scene/objects/Plane.h materials/BSSRDF.h materials/Lambertian.h common/MathUtils.h common/ScatterInfo.h common/Pdf.h)
+set(OBJLOAD
+        lib/OBJ-Loader/Source/OBJ_Loader.h
+)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm SDL2::SDL2-static GLEW::glew OpenMP::OpenMP_CXX)
+add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD} main.cpp Raytracer.cpp Raytracer.h common/Ray.h scene/SceneMgr.cpp scene/SceneMgr.h scene/SceneObject.h common/Intersection.h AppSettings.h materials/Material.h common/ColorBuffer.h common/Random.h common/Camera.cpp common/Camera.h AppSettings.cpp scene/objects/Sphere.cpp scene/objects/Sphere.h scene/objects/Polygon.cpp scene/objects/Polygon.h materials/Metal.h GLviewer/GLViewer.cpp GLviewer/GLViewer.h GLviewer/Utils.h Scenes.h materials/Dielectric.h scene/objects/Plane.cpp scene/objects/Plane.h materials/BSSRDF.h materials/Lambertian.h common/MathUtils.h common/ScatterInfo.h common/Pdf.h scene/objects/ObjLoader.h)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    target_link_libraries(${PROJECT_NAME} PUBLIC glm SDL2::SDL2-static GLEW::glew)
+else()
+    target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm SDL2::SDL2-static GLEW::glew OpenMP::OpenMP_CXX)
+endif()
+
+add_executable(OBJ-example ${OBJLOAD} lib/OBJ-Loader/examples/1\ -\ LoadAndPrint/e1_loadandprint.cpp)

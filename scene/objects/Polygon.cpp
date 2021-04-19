@@ -13,15 +13,15 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
     glm::vec3 edge1, edge2, h, s, q;
     float a,f,u,v;
 
-    edge1 = p2 - p1;
-    edge2 = p3 - p1;
+    edge1 = p2.p - p1.p;
+    edge2 = p3.p - p1.p;
     h = cross(ray.direction, edge2);
     a = dot(edge1, h);
     if (a > -EPSILON && a < EPSILON)
         return false;    // This ray is parallel to this triangle.
 
     f = 1.f/a;
-    s = ray.origin - p1;
+    s = ray.origin - p1.p;
     u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
         return false;
@@ -38,7 +38,12 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
         intersection.t = t;
         intersection.point = ray.at(t);
 
-        intersection.setFaceAndNormal(ray.direction, normalize(cross(edge1, edge2)));
+        if (verticesWithNormal) {
+            auto normal = (1 - v - u) * p1.n + u * p2.n + v * p3.n;
+            intersection.setFaceAndNormal(ray.direction, normalize(normal));
+        } else {
+            intersection.setFaceAndNormal(ray.direction, normalize(cross(edge1, edge2)));
+        }
 
         intersection.objectPtr = shared_from_this();
         intersection.materialPtr = mat;
@@ -50,14 +55,14 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
 
 void Polygon::applyMatrixTransformation(glm::mat4 matrix) {
     glm::vec4 tmp_4;
-    tmp_4 = matrix * glm::vec4 (p1, 1.f);
-    p1 = glm::vec3 (tmp_4 / tmp_4.w);
+    tmp_4 = matrix * glm::vec4 (p1.p, 1.f);
+    p1.p = glm::vec3 (tmp_4 / tmp_4.w);
 
-    tmp_4 = matrix * glm::vec4 (p2, 1.f);
-    p2 = glm::vec3 (tmp_4 / tmp_4.w);
+    tmp_4 = matrix * glm::vec4 (p2.p, 1.f);
+    p2.p = glm::vec3 (tmp_4 / tmp_4.w);
 
-    tmp_4 = matrix * glm::vec4 (p3, 1.f);
-    p3 = glm::vec3 (tmp_4 / tmp_4.w);
+    tmp_4 = matrix * glm::vec4 (p3.p, 1.f);
+    p3.p = glm::vec3 (tmp_4 / tmp_4.w);
 }
 
 float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
@@ -65,7 +70,7 @@ float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
     if (!this->intersect(Ray(origin, v), AppSettings::tMin, AppSettings::tMax, intersection))
         return 0;
 
-    auto area = length(cross(p2-p1, p3-p1)) * 0.5; //(x1-x0)*(z1-z0);
+    auto area = length(cross(p2.p-p1.p, p3.p-p1.p)) * 0.5; //(x1-x0)*(z1-z0);
     auto distance_squared = intersection.t * intersection.t * length2(v);
     auto cosine = fabs(dot(v, intersection.normal) / length(v));
 
@@ -80,7 +85,7 @@ glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
         b = 1-b;
     }
 
-    auto randomPoint = p1 + a*(p2-p1) + b*(p3-p1);
+    auto randomPoint = p1.p + a*(p2.p-p1.p) + b*(p3.p-p1.p);
     return randomPoint - origin;
 }
 

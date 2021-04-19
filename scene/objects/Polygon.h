@@ -10,10 +10,18 @@
 #include <vector>
 #include "../SceneObject.h"
 
+struct Vertex {
+    Vertex(glm::vec3 p, glm::vec3 n) : p(p), n(n) {}
+    glm::vec3 p, n;
+};
+
 class Polygon : public SceneObject, public std::enable_shared_from_this<Polygon> {
 public:
     Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, std::shared_ptr<Material> mat)
-        : SceneObject(), p1(p1), p2(p2), p3(p3), mat(std::move(mat)) {}
+        : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), mat(std::move(mat)), verticesWithNormal(false) {}
+
+    Polygon(Vertex p1, Vertex p2, Vertex p3, std::shared_ptr<Material> mat)
+        : SceneObject(), p1(p1), p2(p2), p3(p3), mat(std::move(mat)), verticesWithNormal(true) {}
 
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
     void applyMatrixTransformation(glm::mat4 matrix);
@@ -32,9 +40,10 @@ public:
     std::shared_ptr<Material> mat;
 
 private:
-    glm::vec3 p1;
-    glm::vec3 p2;
-    glm::vec3 p3;
+    Vertex p1;
+    Vertex p2;
+    Vertex p3;
+    bool verticesWithNormal;
 };
 
 class PolygonMesh : public SceneObject {

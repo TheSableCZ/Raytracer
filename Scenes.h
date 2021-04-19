@@ -14,6 +14,7 @@
 #include "materials/Lambertian.h"
 #include "scene/objects/Plane.h"
 #include "materials/BSSRDF.h"
+#include "scene/objects/ObjLoader.h"
 #include <glm/gtc/type_ptr.hpp>
 
 class Scene {
@@ -223,6 +224,27 @@ class BlenderTest : public Scene {
         box->applyMatrixTransformation(matrix);
 
         scene.addSceneObject(box);
+    }
+
+    void gui(bool &needReset) override {}
+};
+
+class ObjTest : public Scene {
+    void createScene(SceneMgr &scene) override {
+        //AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
+        AppSettings::lookfrom = glm::vec3(-4, 1, 4);
+        //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
+        AppSettings::lookat = glm::vec3(0, 0, 0);
+        AppSettings::aperture = 0.f;
+        AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        scene.camera().init();
+
+        auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        auto meshes = ObjLoader::loadFromFile("cruiser.obj", red);
+
+        for (auto &mesh : meshes) {
+            scene.addSceneObject(mesh);
+        }
     }
 
     void gui(bool &needReset) override {}

@@ -20,6 +20,10 @@ glm::vec3 Raytracer::trace(const Ray &ray, int depth, int colorChannel) {
     if (!sceneMgr.intersect(ray, intersection))
         return AppSettings::backgroundColor;
 
+    // TODO:
+    if (AppSettings::debug_showNormals)
+        return intersection.normal;
+
 #ifndef NDEBUG
     if (AppSettings::debug_showNormals)
         return intersection.normal;
