@@ -12,11 +12,14 @@
 class Material {
 public:
     virtual glm::vec3 emitted(const Ray &ray) { return glm::vec3(0); }
-    virtual bool
-    scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo, int colorChannel) const = 0;
+    virtual bool scatter(const Ray &inRay, const Intersection &intersection, ScatterInfo &scatterInfo, int colorChannel) const = 0;
     virtual bool scatterByColors() { return false; }
-    virtual float scatteringPdf(const Ray &inRay, const Intersection &intersection, const Ray &scatteredRay,
-                                const ScatterInfo &scatterInfo) const {
+    virtual float scatteringPdf(
+        const Ray          &inRay,
+        const Intersection &intersection,
+        const Ray          &scatteredRay,
+        const ScatterInfo  &scatterInfo
+    ) const {
         return 0;
     }
 };

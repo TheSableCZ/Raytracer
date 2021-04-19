@@ -83,8 +83,8 @@ inline glm::vec3 calculateRandomDirectionInHemisphere(glm::vec3 normal) {
             glm::normalize(glm::cross(normal, perpendicularDirection1));
 
     return up * normal
-           + cos(around) * over * perpendicularDirection1
-           + sin(around) * over * perpendicularDirection2;
+           + float(cos(around)) * over * perpendicularDirection1
+           + float(sin(around)) * over * perpendicularDirection2;
 }
 
 #endif //RAYTRACER_RANDOM_H

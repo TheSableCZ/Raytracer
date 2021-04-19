@@ -9,6 +9,8 @@
 #include <GL/glew.h>
 #include "../Raytracer.h"
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class Scene;
 

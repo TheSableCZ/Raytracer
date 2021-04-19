@@ -7,9 +7,9 @@
 
 bool Sphere::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
     glm::vec3 oc = ray.origin - center;
-    auto a = glm::length2(ray.direction);
-    auto half_b = dot(oc, ray.direction);
-    auto c = glm::length2(oc) - radius*radius;
+    auto a       = glm::length2(ray.direction);
+    auto half_b  = dot(oc, ray.direction);
+    auto c       = glm::length2(oc) - radius*radius;
 
     auto discriminant = half_b*half_b - a*c;
     if (discriminant < 0) return false;

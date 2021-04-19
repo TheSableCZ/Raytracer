@@ -8,6 +8,7 @@
 #include <vector>
 #include <glm/vec3.hpp>
 #include <fstream>
+#include <functional>
 
 struct ColorBuffer {
     ColorBuffer(int width, int height) : width(width), height(height) {

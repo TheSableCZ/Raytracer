@@ -48,9 +48,13 @@ glm::vec3 Raytracer::trace(const Ray &ray, int depth, int colorChannel) {
     return intersection.materialPtr->emitted(ray);
 }
 
-inline glm::vec3
-Raytracer::calculateScatteredRay(const Ray &inRay, const Intersection &intersection, const ScatterInfo &scatterInfo,
-                                 int depth, int colorChannel) {
+inline glm::vec3 Raytracer::calculateScatteredRay(
+    const Ray &inRay,
+    const Intersection &intersection,
+    const ScatterInfo &scatterInfo,
+    int depth,
+    int colorChannel
+) {
     if (scatterInfo.useMC) {
         std::shared_ptr<Pdf> p;
         if (AppSettings::lightsDirectSampling && scene().lightSourcesCount() > 0
@@ -81,8 +85,8 @@ Raytracer::calculateScatteredRay(const Ray &inRay, const Intersection &intersect
 }
 
 void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
+    #pragma omp parallel for collapse(2) schedule(dynamic, 600)
     for (int j = 0; j < height; ++j) {
-        #pragma omp parallel for
         for (int i = 0; i < width; ++i) {
             float u, v;
             if (AppSettings::antialiasing) {

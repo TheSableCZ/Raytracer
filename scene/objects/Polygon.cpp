@@ -25,6 +25,7 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
     u = f * dot(s, h);
     if (u < 0.0 || u > 1.0)
         return false;
+
     q = cross(s, edge1);
     v = f * dot(ray.direction, q);
     if (v < 0.0 || u + v > 1.0)
