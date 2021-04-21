@@ -8,6 +8,7 @@
 #include "../common/Ray.h"
 #include "../common/Intersection.h"
 #include "AccelerationDS.h"
+#include <string>
 
 class SceneObject : public std::enable_shared_from_this<SceneObject> {
 public:
@@ -19,9 +20,11 @@ public:
 
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection);
     virtual AABBValue getAABBValue() const;
-    virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) { return 0.0; }
+    virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+        return 0.0;
+    }
     virtual glm::vec3 randomDirection(const glm::vec3 &origin) const { return glm::vec3(0); }
-    virtual std::vector<std::shared_ptr<SceneObject>> getLightSources();
+    virtual std::vector<std::shared_ptr<SceneObject>> getLightSources(const glm::mat4 &T);
     virtual std::vector<std::shared_ptr<SceneObject>> getLeafs();
     virtual void prepare();
 
@@ -39,10 +42,13 @@ public:
 
     void setMaterial(const std::shared_ptr<Material> &mat) { this->mat = mat; }
 
+    virtual void applyMatrixTransformation(glm::mat4 matrix) {};
+    virtual std::shared_ptr<SceneObject> copyAndTransform(const glm::mat4 &T);
+
 protected:
     glm::mat4 transform = glm::mat4(1.0f);
     std::vector<std::shared_ptr<SceneObject>> children;
-    std::unique_ptr<AccelerationDS> accelerationDS;
+    std::shared_ptr<AccelerationDS> accelerationDS;
     std::shared_ptr<Material> mat;
     std::string msg = "";
 };

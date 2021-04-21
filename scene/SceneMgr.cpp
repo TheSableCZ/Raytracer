@@ -16,5 +16,5 @@ bool SceneMgr::intersect(const Ray &ray, Intersection &intersection) {
 
 void SceneMgr::prepare() {
     SceneObject::prepare();
-    lightSources = getLightSources();
+    lightSources = getLightSources(transform);
 }

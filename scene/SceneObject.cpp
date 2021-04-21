@@ -39,15 +39,12 @@ bool SceneObject::intersect(const Ray &ray, float tMin, float tMax, Intersection
     float scaleFactor = glm::length(ray.direction) / glm::length(actRay.direction);
     actRay.direction = glm::normalize(actRay.direction);
 
-    if (msg != "") {
-        std::cout << "crrr...";
-    }
-
     if (accelerationDS != nullptr) {
         if (accelerationDS->intersect(actRay, tMin, tMax, intersection)) {
             intersection.point = transform * glm::vec4(intersection.point, 1.0f);
-            intersection.normal = transform * glm::vec4(intersection.normal, 1.0f);
-            intersection.t *= scaleFactor;
+            intersection.normal = transform * glm::vec4(intersection.normal, 0.0f);
+            //intersection.t *= scaleFactor;
+            intersection.t = glm::distance(ray.origin, intersection.point);
             return true;
         }
     }
@@ -58,13 +55,15 @@ AABBValue SceneObject::getAABBValue() const {
     return {};
 }
 
-std::vector<std::shared_ptr<SceneObject>> SceneObject::getLightSources() {
+std::vector<std::shared_ptr<SceneObject>> SceneObject::getLightSources(const glm::mat4 &T) {
     if (isLightSource()) {
-        return { shared_from_this() };
+        auto cpy = copyAndTransform(T);
+        return { cpy };
     } else {
+        auto matrix = transform * T;
         std::vector<std::shared_ptr<SceneObject>> res;
         for (const auto &child : children) {
-            auto lights = child->getLightSources();
+            auto lights = child->getLightSources(matrix);
             res.insert(res.end(), lights.begin(), lights.end());
         }
         return res;
@@ -73,7 +72,7 @@ std::vector<std::shared_ptr<SceneObject>> SceneObject::getLightSources() {
 
 std::vector<std::shared_ptr<SceneObject>> SceneObject::getLeafs() {
     if (isLeafNode() || accelerationDS != nullptr) {
-        return { shared_from_this() };
+        return { std::enable_shared_from_this<SceneObject>::shared_from_this() };
     } else {
         std::vector<std::shared_ptr<SceneObject>> res;
         for (const auto &child : children) {
@@ -92,4 +91,10 @@ void SceneObject::makeLight() {
             child->makeLight();
         }
     }
+}
+
+std::shared_ptr<SceneObject> SceneObject::copyAndTransform(const glm::mat4 &T) {
+    auto cpy = std::make_shared<SceneObject>(*shared_from_this());
+    cpy->applyMatrixTransformation(T);
+    return cpy;
 }

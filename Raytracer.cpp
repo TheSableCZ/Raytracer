@@ -89,7 +89,7 @@ inline glm::vec3 Raytracer::calculateScatteredRay(
 }
 
 void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
-    // #pragma omp parallel for collapse(2) schedule(dynamic, 600)
+    #pragma omp parallel for collapse(2) schedule(dynamic, 600)
     for (int j = 0; j < height; ++j) {
         for (int i = 0; i < width; ++i) {
             float u, v;

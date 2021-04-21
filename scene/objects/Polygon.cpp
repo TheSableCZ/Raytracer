@@ -45,7 +45,7 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
             intersection.setFaceAndNormal(ray.direction, normalize(cross(edge1, edge2)));
         }
 
-        intersection.objectPtr = shared_from_this();
+        intersection.objectPtr = std::enable_shared_from_this<Polygon>::shared_from_this();
         intersection.materialPtr = mat;
         return true;
     }
@@ -87,6 +87,12 @@ glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
 
     auto randomPoint = p1.p + a*(p2.p-p1.p) + b*(p3.p-p1.p);
     return randomPoint - origin;
+}
+
+std::shared_ptr<SceneObject> Polygon::copyAndTransform(const glm::mat4 &T) {
+    auto cpy = std::make_shared<Polygon>(*std::enable_shared_from_this<Polygon>::shared_from_this());
+    cpy->applyMatrixTransformation(T);
+    return cpy;
 }
 
 // bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {

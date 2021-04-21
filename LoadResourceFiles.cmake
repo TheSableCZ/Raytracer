@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.18)
+cmake_minimum_required (VERSION 3.17)
 
 if(NOT DEFINED ${${PROJECT_NAME}_RESOURCES})
     if(NOT DEFINED ${DEFAULT_RESOERCES_PATH})

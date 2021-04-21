@@ -210,30 +210,35 @@ class BlenderTest : public Scene {
 
         auto light = std::make_shared<SimpleMat>(glm::vec3(500));
         auto lightRect = createRect(light);
-        // lightRect->makeLight();
-        // auto mat = glm::scale(
-        //                 glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
-        //         glm::vec3 (1.f));
-        // auto rotate = glm::rotate(
-        //         glm::rotate(
-        //         glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
-        //         glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
-        //         glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
+         lightRect->makeLight();
+         auto mat = glm::scale(
+                         glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
+                 glm::vec3 (1.f));
+         auto rotate = glm::rotate(
+                 glm::rotate(
+                 glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
+                 glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
+                 glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
 
-        auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+        //auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+        //matrix = glm::rotate(matrix, glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
+        auto matrix = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 3.2f, 0.f));
+        matrix = glm::rotate(matrix, glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
+        matrix = glm::scale(matrix, glm::vec3(3.f));
         lightRect->setTransform(matrix);
 
         scene.addChild(lightRect);
 
-        // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
-        // auto box = createUnitBox(bssrdf);
+         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+         auto box = createUnitBox(red);
 
-        // auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
-        // box->setTransform(matrix);
+         matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+         //box->setTransform(matrix);
 
-        // scene.addChild(box);
+         scene.addChild(box);
 
-        scene.prepare();
+         scene.prepare();
     }
 
     void gui(bool &needReset) override {}
