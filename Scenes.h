@@ -275,6 +275,8 @@ class LightedCube : public Scene {
 
 class ObjTest : public Scene {
     void createScene(SceneMgr &scene) override {
+        //AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
+        //AppSettings::lookfrom = glm::vec3(-3, 3, 3);
         AppSettings::lookfrom = glm::vec3(3, 3, 3);
         // AppSettings::lookfrom = glm::vec3(-4, 1, 4);
         //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
@@ -284,6 +286,19 @@ class ObjTest : public Scene {
         AppSettings::backgroundColor = glm::vec3 (0.f);
 
         scene.camera().init();
+
+        //auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        //auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
+        //auto glass = std::make_shared<Dielectric>(1.5);
+        //auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.3f);
+        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.6f, .6f, 1.f), .02f);
+
+        //std::unordered_map<std::string, std::shared_ptr<Material>> mats;
+        //mats.insert(std::pair("glass", glass));
+        //mats.insert(std::pair("cruiser", bssrdf));
+        //mats.insert(std::pair("metal", metal));
+
+        //auto meshes = ObjLoader::loadFromFile("cruiser.obj", red, mats);
 
         auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
@@ -299,7 +314,16 @@ class ObjTest : public Scene {
             scene.addChild(mesh);
         }
 
+        //auto light = std::make_shared<SimpleMat>(glm::vec3(15, 15, 15));
+        //auto lightObj = createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),
+        //                           glm::vec3(-10, 20, 5));
+        //lightObj->lightSource = true;
+        //scene.addSceneObject(lightObj);
+
+        //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0, -1.f, 0), white));
+
         scene.prepare();
+
     }
 
     void gui(bool &needReset) override {}
