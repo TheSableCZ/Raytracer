@@ -35,12 +35,69 @@ set(OBJLOAD
         lib/OBJ-Loader/Source/OBJ_Loader.h
 )
 
-add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD} main.cpp Raytracer.cpp Raytracer.h common/Ray.h scene/SceneMgr.cpp scene/SceneMgr.h scene/SceneObject.h common/Intersection.h AppSettings.h materials/Material.h common/ColorBuffer.h common/Random.h common/Camera.cpp common/Camera.h AppSettings.cpp scene/objects/Sphere.cpp scene/objects/Sphere.h scene/objects/Polygon.cpp scene/objects/Polygon.h materials/Metal.h GLviewer/GLViewer.cpp GLviewer/GLViewer.h GLviewer/Utils.h Scenes.h materials/Dielectric.h scene/objects/Plane.cpp scene/objects/Plane.h materials/BSSRDF.h materials/Lambertian.h common/MathUtils.h common/ScatterInfo.h common/Pdf.h scene/objects/ObjLoader.h)
+# load paths to resource files as definitions
+set(RESOURCE_FILES )
+set(RESOURCE_FULL_PATHS )
+FILE(GLOB RESOURCE_FULL_PATHS resources/*.obj)
+foreach(fullname ${RESOURCE_FULL_PATHS})
+    get_filename_component(filename ${fullname} NAME)
+    list(APPEND RESOURCE_FILES ${filename})
+endforeach()
+include(LoadResourceFiles.cmake)
+message(${RESOURCES_DEBUG_COMPILE_DEFINITIONS})
+
+
+set(COMPILE_DEFINITIONS ${RESOURCES_DEBUG_COMPILE_DEFINITIONS})
+
+add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
+    main.cpp
+    Raytracer.cpp
+    Raytracer.h
+    AppSettings.h
+    AppSettings.cpp
+    Scenes.h
+
+    materials/Material.h
+    materials/Metal.h
+    materials/Dielectric.h
+    materials/BSSRDF.h
+    materials/Lambertian.h
+
+    common/ColorBuffer.h
+    common/Random.h
+    common/Camera.cpp
+    common/Camera.h
+    common/Intersection.h
+    common/Ray.h
+    common/MathUtils.h
+    common/ScatterInfo.h
+    common/Pdf.h
+
+    GLviewer/GLViewer.cpp
+    GLviewer/GLViewer.h
+    GLviewer/Utils.h
+
+    scene/SceneMgr.cpp
+    scene/SceneMgr.h
+    scene/SceneObject.h
+        scene/objects/Sphere.cpp
+        scene/objects/Plane.cpp
+        scene/objects/Plane.h
+        scene/objects/Sphere.h
+        scene/objects/Polygon.cpp
+        scene/objects/Polygon.h
+        scene/objects/ObjLoader.h
+    scene/AccelerationDS.h
+        scene/accelerationDS/LinearADS.h
+        scene/accelerationDS/LinearADS.cpp
+)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     target_link_libraries(${PROJECT_NAME} PUBLIC glm SDL2::SDL2-static GLEW::glew)
 else()
     target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm SDL2::SDL2-static GLEW::glew OpenMP::OpenMP_CXX)
 endif()
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${COMPILE_DEFINITIONS})
 
 add_executable(OBJ-example ${OBJLOAD} lib/OBJ-Loader/examples/1\ -\ LoadAndPrint/e1_loadandprint.cpp)

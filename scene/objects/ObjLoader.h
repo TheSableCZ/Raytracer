@@ -43,14 +43,14 @@ std::vector<std::shared_ptr<PolygonMesh>> ObjLoader::loadFromFile(const std::str
                 mat = defaultMat;
             }
 
-            auto polyMesh = std::make_shared<PolygonMesh>();
+            auto polyMesh = std::make_shared<PolygonMesh>(mat);
 
             for (int i = 0; i < curMesh.Indices.size(); i += 3) {
                 int j1 = curMesh.Indices[i], j2 = curMesh.Indices[i+1], j3 = curMesh.Indices[i+2];
                 auto p1 = Vertex(vec3ToGlm3(curMesh.Vertices[j1].Position), vec3ToGlm3(curMesh.Vertices[j1].Normal));
                 auto p2 = Vertex(vec3ToGlm3(curMesh.Vertices[j2].Position), vec3ToGlm3(curMesh.Vertices[j2].Normal));
                 auto p3 = Vertex(vec3ToGlm3(curMesh.Vertices[j3].Position), vec3ToGlm3(curMesh.Vertices[j3].Normal));
-                auto poly = std::make_shared<Polygon>(p1, p2, p3, mat);
+                auto poly = std::make_shared<Polygon>(p1, p2, p3);
                 polyMesh->add(poly);
             }
 

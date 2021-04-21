@@ -13,7 +13,14 @@
 
 GLViewer::GLViewer() : backgroundColor(AppSettings::backgroundColor) {
     SDL_Init(SDL_INIT_EVERYTHING);
-    window = SDL_CreateWindow("ogl",0,0, AppSettings::imgWidth, AppSettings::imgHeight, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow(
+        "ogl",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        AppSettings::imgWidth,
+        AppSettings::imgHeight,
+        SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL
+    );
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,1);
@@ -52,6 +59,8 @@ void GLViewer::run() {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if(event.type == SDL_QUIT){
                 running = false;
+            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                glViewport(0, 0, event.window.data1, event.window.data2);
             }
         }
 
@@ -174,10 +183,11 @@ void GLViewer::initGLObjects() {
 
 void GLViewer::initScenes() {
     //scenes.emplace_back(std::make_shared<SimpleScene>());
-    /*scenes.emplace_back(std::make_shared<CornellBox>());
-    scenes.emplace_back(std::make_shared<CornellBox2>());
-    scenes.emplace_back(std::make_shared<MaterialScene>());
-    scenes.emplace_back(std::make_shared<BlenderTest>());*/
+    // scenes.emplace_back(std::make_shared<CornellBox>());
+    // scenes.emplace_back(std::make_shared<CornellBox2>());
+    // scenes.emplace_back(std::make_shared<MaterialScene>());
+    // scenes.emplace_back(std::make_shared<BlenderTest>());
+    scenes.emplace_back(std::make_shared<LightedCube>());
     scenes.emplace_back(std::make_shared<ObjTest>());
 }
 

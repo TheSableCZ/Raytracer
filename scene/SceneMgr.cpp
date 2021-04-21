@@ -14,19 +14,7 @@ void SceneMgr::addSceneObject(const std::shared_ptr<SceneObject>& sceneObj) {
 }
 
 bool SceneMgr::intersect(const Ray &ray, Intersection &intersection) {
-    Intersection tempRec;
-    auto intersect = false;
-    auto closestSoFar = AppSettings::tMax;
-
-    for (const auto& object : sceneObjs) {
-        if (object->intersect(ray, AppSettings::tMin, closestSoFar, tempRec)) {
-            intersect = true;
-            closestSoFar = tempRec.t;
-            intersection = tempRec;
-        }
-    }
-
-    return intersect;
+    return accelerationDS->intersect(ray, AppSettings::tMin, AppSettings::tMax, intersection);
 }
 
 std::shared_ptr<SceneObjsPdf> SceneMgr::getLightPdf(const glm::vec3 &origin) const {

@@ -17,11 +17,11 @@ struct Vertex {
 
 class Polygon : public SceneObject, public std::enable_shared_from_this<Polygon> {
 public:
-    Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, std::shared_ptr<Material> mat)
-        : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), mat(std::move(mat)), verticesWithNormal(false) {}
+    Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
+        : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), verticesWithNormal(false) {}
 
-    Polygon(Vertex p1, Vertex p2, Vertex p3, std::shared_ptr<Material> mat)
-        : SceneObject(), p1(p1), p2(p2), p3(p3), mat(std::move(mat)), verticesWithNormal(true) {}
+    Polygon(Vertex p1, Vertex p2, Vertex p3)
+        : SceneObject(), p1(p1), p2(p2), p3(p3), verticesWithNormal(true) {}
 
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
     void applyMatrixTransformation(glm::mat4 matrix);
@@ -37,8 +37,6 @@ public:
     float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override;
     glm::vec3 randomDirection(const glm::vec3 &origin) const override;
 
-    std::shared_ptr<Material> mat;
-
 private:
     Vertex p1;
     Vertex p2;
@@ -49,8 +47,11 @@ private:
 class PolygonMesh : public SceneObject {
 public:
     PolygonMesh() = default;
-    explicit PolygonMesh(std::vector<std::shared_ptr<Polygon>> polygonMesh)
-        : SceneObject(), polygons(std::move(polygonMesh)) {}
+
+    PolygonMesh(std::shared_ptr<Material> mat) : SceneObject(), mat(std::move(mat)) {}
+
+    explicit PolygonMesh(std::vector<std::shared_ptr<Polygon>> polygonMesh, std::shared_ptr<Material> mat)
+        : SceneObject(), polygons(std::move(polygonMesh)), mat(std::move(mat)) {}
 
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
 
@@ -74,6 +75,7 @@ public:
 
 
     bool lightSource = false;
+    std::shared_ptr<Material> mat;
 
 private:
     std::vector<std::shared_ptr<Polygon>> polygons;
