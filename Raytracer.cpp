@@ -17,7 +17,7 @@ glm::vec3 Raytracer::trace(const Ray &ray, int depth, int colorChannel) {
         return glm::vec3(0.f);
 
     Intersection intersection;
-    if (!sceneMgr.intersect(ray, intersection))
+    if (!sceneMgr->intersect(ray, intersection))
         return AppSettings::backgroundColor;
 
     // TODO:
@@ -61,19 +61,19 @@ inline glm::vec3 Raytracer::calculateScatteredRay(
 ) {
     if (scatterInfo.useMC) {
         std::shared_ptr<Pdf> p;
-        if (AppSettings::lightsDirectSampling && scene().lightSourcesCount() > 0
+        if (AppSettings::lightsDirectSampling && scene()->lightSourcesCount() > 0
                 && scatterInfo.scatteredRayType != ScatteredRayType::BSSRDF_enteringMedium
                 && scatterInfo.scatteredRayType != ScatteredRayType::BSSRDF_insideMedium
                 )
         {
-            p = std::make_shared<MixturePdf>(scatterInfo.pdfPtr, scene().getLightPdf(scatterInfo.rayOrigin));
+            p = std::make_shared<MixturePdf>(scatterInfo.pdfPtr, scene()->getLightPdf(scatterInfo.rayOrigin));
         } else {
             p = scatterInfo.pdfPtr;
         }
 
 #ifndef NDEBUG
         if (AppSettings::debug_sampleOnlyLights) {
-            p = scene().getLightPdf(scatterInfo.rayOrigin);
+            p = scene()->getLightPdf(scatterInfo.rayOrigin);
         }
 #endif
 
@@ -89,7 +89,7 @@ inline glm::vec3 Raytracer::calculateScatteredRay(
 }
 
 void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
-    #pragma omp parallel for collapse(2) schedule(dynamic, 600)
+    // #pragma omp parallel for collapse(2) schedule(dynamic, 600)
     for (int j = 0; j < height; ++j) {
         for (int i = 0; i < width; ++i) {
             float u, v;
@@ -100,7 +100,7 @@ void Raytracer::renderStage(ColorBuffer &colorBuffer, int width, int height) {
                 u = static_cast<float>(i) / static_cast<float>(width - 1);
                 v = static_cast<float>(j) / static_cast<float>(height - 1);
             }
-            Ray r = scene().camera().getRay(u, v);
+            Ray r = scene()->camera().getRay(u, v);
             auto resultColor = trace(r, AppSettings::maxDepth, -1);
             colorBuffer.p[(j * width) + i] += resultColor;
         }
@@ -114,5 +114,6 @@ glm::vec3 Raytracer::pixelColorOperation(glm::vec3 pixelColor, int samplesPerPix
 }
 
 void Raytracer::initCameraWithAppSettings() {
-    scene().camera().init();
+    sceneMgr = std::make_shared<SceneMgr>();
+    scene()->camera().init();
 }

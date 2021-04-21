@@ -46,6 +46,7 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
         }
 
         intersection.objectPtr = shared_from_this();
+        intersection.materialPtr = mat;
         return true;
     }
     else // This means that there is a line intersection but not a ray intersection.
@@ -88,41 +89,41 @@ glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
     return randomPoint - origin;
 }
 
-bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
-    Intersection tempRec;
-    tempRec.materialPtr = mat;
-    auto intersect = false;
-    auto closestSoFar = tMax;
+// bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
+//     Intersection tempRec;
+//     tempRec.materialPtr = mat;
+//     auto intersect = false;
+//     auto closestSoFar = tMax;
 
-    for (const auto& polygon : polygons) {
-        if (polygon->intersect(ray, tMin, closestSoFar, tempRec)) {
-            intersect = true;
-            closestSoFar = tempRec.t;
-            intersection = tempRec;
-        }
-    }
+//     for (const auto& polygon : polygons) {
+//         if (polygon->intersect(ray, tMin, closestSoFar, tempRec)) {
+//             intersect = true;
+//             closestSoFar = tempRec.t;
+//             intersection = tempRec;
+//         }
+//     }
 
-    return intersect;
-}
+//     return intersect;
+// }
 
-float PolygonMesh::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
-    auto weight = 1.0/polygons.size();
-    auto sum = 0.0;
+// float PolygonMesh::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+//     auto weight = 1.0/polygons.size();
+//     auto sum = 0.0;
 
-    for (const auto &polygon : polygons)
-        sum += weight * polygon->pdfValue(origin, v);
+//     for (const auto &polygon : polygons)
+//         sum += weight * polygon->pdfValue(origin, v);
 
-    return sum;
-}
+//     return sum;
+// }
 
-glm::vec3 PolygonMesh::randomDirection(const glm::vec3 &origin) const {
-    auto int_size = static_cast<int>(polygons.size());
-    if (int_size > 0) {
-        auto randIdx = randomInt(0, int_size - 1);
-        return polygons[randIdx]->randomDirection(origin);
-    }
-    return glm::vec3 (0.f);
-}
+// glm::vec3 PolygonMesh::randomDirection(const glm::vec3 &origin) const {
+//     auto int_size = static_cast<int>(polygons.size());
+//     if (int_size > 0) {
+//         auto randIdx = randomInt(0, int_size - 1);
+//         return polygons[randIdx]->randomDirection(origin);
+//     }
+//     return glm::vec3 (0.f);
+// }
 
 std::shared_ptr<PolygonMesh> createRect(const std::shared_ptr<Material> &mat, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {
     std::vector<std::shared_ptr<Polygon>> polygons;

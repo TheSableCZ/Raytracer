@@ -23,11 +23,11 @@ public:
 
     void initCameraWithAppSettings();
 
-    SceneMgr& scene() { return sceneMgr; }
-    void clearScene() { sceneMgr = SceneMgr(); sceneMgr.camera().init(); }
+    std::shared_ptr<SceneMgr>& scene() { return sceneMgr; }
+    void clearScene() { sceneMgr = std::make_shared<SceneMgr>(); sceneMgr->camera().init(); }
 
 private:
-    SceneMgr sceneMgr;
+    std::shared_ptr<SceneMgr> sceneMgr;
 };
 
 

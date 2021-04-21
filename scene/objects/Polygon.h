@@ -9,13 +9,14 @@
 #include <utility>
 #include <vector>
 #include "../SceneObject.h"
+#include "../accelerationDS/LinearADS.h"
 
 struct Vertex {
     Vertex(glm::vec3 p, glm::vec3 n) : p(p), n(n) {}
     glm::vec3 p, n;
 };
 
-class Polygon : public SceneObject, public std::enable_shared_from_this<Polygon> {
+class Polygon : public SceneObject {
 public:
     Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
         : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), verticesWithNormal(false) {}
@@ -37,6 +38,7 @@ public:
     float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override;
     glm::vec3 randomDirection(const glm::vec3 &origin) const override;
 
+
 private:
     Vertex p1;
     Vertex p2;
@@ -46,39 +48,51 @@ private:
 
 class PolygonMesh : public SceneObject {
 public:
-    PolygonMesh() = default;
+    PolygonMesh() : SceneObject(std::make_unique<LinearADS>()) {}
 
-    PolygonMesh(std::shared_ptr<Material> mat) : SceneObject(), mat(std::move(mat)) {}
-
-    explicit PolygonMesh(std::vector<std::shared_ptr<Polygon>> polygonMesh, std::shared_ptr<Material> mat)
-        : SceneObject(), polygons(std::move(polygonMesh)), mat(std::move(mat)) {}
-
-    bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
-
-    void applyMatrixTransformation(glm::mat4 matrix) {
-        for(const auto &polygon: polygons)
-            polygon->applyMatrixTransformation(matrix);
+    PolygonMesh(std::shared_ptr<Material> mat) : SceneObject(std::make_unique<LinearADS>()) {
+        this->mat = std::move(mat);
     }
 
-    void add(const std::shared_ptr<Polygon> &polygon) {
-        polygons.emplace_back(polygon);
+    explicit PolygonMesh(const std::vector<std::shared_ptr<Polygon>> &polygonMesh, std::shared_ptr<Material> mat)
+        : SceneObject()
+    {
+        this->mat = std::move(mat);
+        for (const auto &polygon : polygonMesh) {
+            this->add(polygon);
+        }
+        msg = "PolygonMesh";
+    }
+
+    // bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
+
+    // void applyMatrixTransformation(glm::mat4 matrix) {
+    //     for(const auto &polygon: polygons)
+    //         polygon->applyMatrixTransformation(matrix);
+    // }
+
+    void add(const std::shared_ptr<SceneObject> &polygon) {
+        polygon->setMaterial(mat);
+        addChild(polygon);
     }
 
     void add(const std::shared_ptr<PolygonMesh> &polygonMesh) {
-        polygons.insert(polygons.end(), polygonMesh->polygons.begin(), polygonMesh->polygons.end());
+        for (const auto &polygon : polygonMesh->children) {
+            this->add(polygon);
+        }
     }
 
-    float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override;
-    glm::vec3 randomDirection(const glm::vec3 &origin) const override;
+    // void add(const std::vector<std::shared_ptr<Polygon>> &polygonMesh) {
+    //     children.insert(children.end(), polygonMesh.begin(), polygonMesh.end());
+    // }
 
-    bool isLightSource() const override { return lightSource; }
+    // float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override;
+    // glm::vec3 randomDirection(const glm::vec3 &origin) const override;
 
-
-    bool lightSource = false;
-    std::shared_ptr<Material> mat;
+    // std::shared_ptr<Material> mat;
 
 private:
-    std::vector<std::shared_ptr<Polygon>> polygons;
+    // std::vector<std::shared_ptr<Polygon>> polygons;
 };
 
 /*

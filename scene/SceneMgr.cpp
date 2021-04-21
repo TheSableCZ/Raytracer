@@ -6,17 +6,15 @@
 #include "../AppSettings.h"
 #include "../common/Pdf.h"
 
-void SceneMgr::addSceneObject(const std::shared_ptr<SceneObject>& sceneObj) {
-    sceneObjs.emplace_back(sceneObj);
-    if (sceneObj->isLightSource()) {
-        lightSources.emplace_back(sceneObj);
-    }
+std::shared_ptr<SceneObjsPdf> SceneMgr::getLightPdf(const glm::vec3 &origin) const {
+    return std::make_shared<SceneObjsPdf>(lightSources, origin);
 }
 
 bool SceneMgr::intersect(const Ray &ray, Intersection &intersection) {
-    return accelerationDS->intersect(ray, AppSettings::tMin, AppSettings::tMax, intersection);
+    return SceneObject::intersect(ray, AppSettings::tMin, AppSettings::tMax, intersection);
 }
 
-std::shared_ptr<SceneObjsPdf> SceneMgr::getLightPdf(const glm::vec3 &origin) const {
-    return std::make_shared<SceneObjsPdf>(lightSources, origin);
+void SceneMgr::prepare() {
+    SceneObject::prepare();
+    lightSources = getLightSources();
 }

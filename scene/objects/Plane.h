@@ -9,7 +9,7 @@
 
 #include "../SceneObject.h"
 
-class Plane : public SceneObject, public std::enable_shared_from_this<Plane> {
+class Plane : public SceneObject {
 public:
     Plane(glm::vec3 normal, glm::vec3 point, std::shared_ptr<Material> mat)
         : SceneObject(), n(normalize(normal)), d(-(dot(n,point))), mat(std::move(mat)) {}

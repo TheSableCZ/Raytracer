@@ -9,16 +9,42 @@
 #include "../common/Intersection.h"
 #include "AccelerationDS.h"
 
-class SceneObject {
+class SceneObject : public std::enable_shared_from_this<SceneObject> {
 public:
     SceneObject() = default;
-    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) = 0;
-    virtual AABBValue getAABBValue() const { return {}; };
+    SceneObject(std::unique_ptr<AccelerationDS> accelerationDS);
+    SceneObject(const std::vector<std::shared_ptr<SceneObject>> &children, std::unique_ptr<AccelerationDS> accelerationDS = nullptr);
 
+    virtual ~SceneObject() {}
+
+    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection);
+    virtual AABBValue getAABBValue() const;
     virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) { return 0.0; }
     virtual glm::vec3 randomDirection(const glm::vec3 &origin) const { return glm::vec3(0); }
+    virtual std::vector<std::shared_ptr<SceneObject>> getLightSources();
+    virtual std::vector<std::shared_ptr<SceneObject>> getLeafs();
+    virtual void prepare();
 
-    virtual bool isLightSource() const { return false; }
+    bool isLeafNode() const { return children.empty(); }
+    bool isLightSource() { return isLeafNode() && lightSource; }
+
+    void setTransform(const glm::mat4 &matrix) {
+        transform = matrix;
+    }
+
+    void addChild(const std::shared_ptr<SceneObject>& sceneObj);
+    void makeLight();
+
+    bool lightSource = false;
+
+    void setMaterial(const std::shared_ptr<Material> &mat) { this->mat = mat; }
+
+protected:
+    glm::mat4 transform = glm::mat4(1.0f);
+    std::vector<std::shared_ptr<SceneObject>> children;
+    std::unique_ptr<AccelerationDS> accelerationDS;
+    std::shared_ptr<Material> mat;
+    std::string msg = "";
 };
 
 #endif //RAYTRACER_SCENEOBJECT_H

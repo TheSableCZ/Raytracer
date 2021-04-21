@@ -80,6 +80,7 @@ add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
     scene/SceneMgr.cpp
     scene/SceneMgr.h
     scene/SceneObject.h
+    scene/SceneObject.cpp
         scene/objects/Sphere.cpp
         scene/objects/Plane.cpp
         scene/objects/Plane.h

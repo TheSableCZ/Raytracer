@@ -38,35 +38,35 @@ public:
         auto lambertianWhite = std::make_shared<Lambertian>(glm::vec3(1.f, 1.f, 1.f));
 
         auto sphere1 = std::make_shared<Sphere>(glm::vec3(-100, 90, 190), 90, lambertianBlue);
-        scene.addSceneObject(sphere1);
+        scene.addChild(sphere1);
 
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(400, 90, 190), 90, lambertianGreen));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(400, 90, 190), 90, lambertianGreen));
 
         auto trg = std::make_shared<Polygon>(glm::vec3(0, 0, 1), glm::vec3(1, 0, 1), glm::vec3(1, 0, 0), light);
         trg->scale(glm::vec3(180));
         trg->translate(glm::vec3(400, 180, 300));
         //trg->scale(glm::vec3(90));
 
-        scene.addSceneObject(trg);
+        scene.addChild(trg);
 
         trg = std::make_shared<Polygon>(glm::vec3(0, 0, 1), glm::vec3(1, 0, 1), glm::vec3(1, 0, 0), light);
         trg->scale(glm::vec3(180));
         trg->translate(glm::vec3(120, 180, 300));
         //trg->scale(glm::vec3(90));
 
-        scene.addSceneObject(trg);
+        scene.addChild(trg);
 
         trg = std::make_shared<Polygon>(glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(1, 0, 1), lambertian);
         trg->scale(glm::vec3(1000, 1000, 10000));
         trg->translate(glm::vec3(-300, 0, 0));
 
-        scene.addSceneObject(trg);
+        scene.addChild(trg);
 
         trg = std::make_shared<Polygon>(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 1), lambertianBlue);
         trg->scale(glm::vec3(1000, 10000, 1000));
         trg->translate(glm::vec3(700, 0, 0));
 
-        scene.addSceneObject(trg);*/
+        scene.addChild(trg);*/
     }
 
     void gui(bool &needReset) override {
@@ -89,7 +89,7 @@ private:
 };
 
 void createCornellBox(SceneMgr &scene) {
-    AppSettings::backgroundColor = glm::vec3(0.f);
+    AppSettings::backgroundColor = glm::vec3(0.6f);
     AppSettings::lookfrom = glm::vec3 (278, 278, -800);
     AppSettings::lookat = glm::vec3 (278, 278, 0);
     AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
@@ -102,20 +102,20 @@ void createCornellBox(SceneMgr &scene) {
 
     auto lightObj = createRect(light, glm::vec3(213, 554, 227), glm::vec3(343, 554, 227), glm::vec3(343, 554, 332),glm::vec3(213, 554, 332));
     lightObj->lightSource = true;
-    scene.addSceneObject(lightObj);
+    scene.addChild(lightObj);
 
-    scene.addSceneObject(createRect(green, glm::vec3(555, 0, 0), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(555, 555, 0)));
-    scene.addSceneObject(createRect(red, glm::vec3(0, 0, 0), glm::vec3(0, 0, 555), glm::vec3(0, 555, 555),glm::vec3(0, 555, 0)));
-    scene.addSceneObject(createRect(white, glm::vec3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(555, 0, 555),glm::vec3(0, 0, 555)));
-    scene.addSceneObject(createRect(white, glm::vec3(0, 555, 0), glm::vec3(555, 555, 0), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
-    scene.addSceneObject(createRect(white, glm::vec3(0, 0, 555), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
+    scene.addChild(createRect(green, glm::vec3(555, 0, 0), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(555, 555, 0)));
+    scene.addChild(createRect(red, glm::vec3(0, 0, 0), glm::vec3(0, 0, 555), glm::vec3(0, 555, 555),glm::vec3(0, 555, 0)));
+    scene.addChild(createRect(white, glm::vec3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(555, 0, 555),glm::vec3(0, 0, 555)));
+    scene.addChild(createRect(white, glm::vec3(0, 555, 0), glm::vec3(555, 555, 0), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
+    scene.addChild(createRect(white, glm::vec3(0, 0, 555), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(0, 555, 555)));
 
     // neefektivní
-    //scene.addSceneObject(std::make_shared<Plane>(glm::vec3 (-1, 0, 0), glm::vec3 (555, 0, 0), green));
-    //scene.addSceneObject(std::make_shared<Plane>(glm::vec3 (1, 0, 0), glm::vec3 (0, 0, 0), red));
-    //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, -1, 0), glm::vec3(0, 555, 0), white));
-    //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1, 0), glm::vec3(0, 0, 0), white));
-    //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 0, 1), glm::vec3(0, 0, 555), white));
+    //scene.addChild(std::make_shared<Plane>(glm::vec3 (-1, 0, 0), glm::vec3 (555, 0, 0), green));
+    //scene.addChild(std::make_shared<Plane>(glm::vec3 (1, 0, 0), glm::vec3 (0, 0, 0), red));
+    //scene.addChild(std::make_shared<Plane>(glm::vec3(0, -1, 0), glm::vec3(0, 555, 0), white));
+    //scene.addChild(std::make_shared<Plane>(glm::vec3(0, 1, 0), glm::vec3(0, 0, 0), white));
+    //scene.addChild(std::make_shared<Plane>(glm::vec3(0, 0, 1), glm::vec3(0, 0, 555), white));
 }
 
 class CornellBox : public Scene {
@@ -132,9 +132,9 @@ class CornellBox : public Scene {
                         glm::vec3(265,200,300)), /*glm::vec3(265,200,450)),*/
                 glm::vec3(165, 400, 165)
         );
-        box->applyMatrixTransformation(matrix);
-        scene.addSceneObject(box);
 
+        box->setTransform(matrix);
+        scene.addChild(box);
         scene.prepare();
     }
 
@@ -150,10 +150,10 @@ class CornellBox2 : public Scene {
         auto glass = std::make_shared<Dielectric>(1.5);
         auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 0.5), 0.3f);
 
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(400, 230, 300), 80, metal));
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(110, 160, 350), 80, diffuse));
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(400, 110, 40), 80, bssrdf));
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(170, 80, 150), 80, glass));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(400, 230, 300), 80, metal));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(110, 160, 350), 80, diffuse));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(400, 110, 40), 80, bssrdf));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(170, 80, 150), 80, glass));
 
         scene.prepare();
     }
@@ -179,19 +179,19 @@ class MaterialScene : public Scene {
         //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(1, 1, 1), 6.f);
         auto white2 = std::make_shared<Lambertian>(glm::vec3(1, 1, 1));
 
-        scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0), white));
+        scene.addChild(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0), white));
         auto lightObj = createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),
                                    glm::vec3(-10, 20, 5));
         lightObj->lightSource = true;
-        scene.addSceneObject(lightObj);
+        scene.addChild(lightObj);
 
-        //scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(-10, 5, 0), 5, glass));
-        scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(10, 5, 0), 5, bssrdf));
+        //scene.addChild(std::make_shared<Sphere>(glm::vec3(-10, 5, 0), 5, glass));
+        scene.addChild(std::make_shared<Sphere>(glm::vec3(10, 5, 0), 5, bssrdf));
         auto box = createUnitBox(bssrdf);
         //box->applyMatrixTransformation(glm::rotate(glm::mat4(1.f), glm::radians(70.f), glm::vec3(0.f, 1.f, 0.f)));
         auto matrix = glm::scale(glm::translate(glm::mat4(1.f), glm::vec3(-10, 5, 0)), glm::vec3(10.f));
-        box->applyMatrixTransformation(matrix);
-        scene.addSceneObject(box);
+        box->setTransform(matrix);
+        scene.addChild(box);
 
         scene.prepare();
     }
@@ -210,26 +210,28 @@ class BlenderTest : public Scene {
 
         auto light = std::make_shared<SimpleMat>(glm::vec3(500));
         auto lightRect = createRect(light);
-        lightRect->lightSource = true;
-        auto mat = glm::scale(
-                        glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
-                glm::vec3 (1.f));
-        auto rotate = glm::rotate(
-                glm::rotate(
-                glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
-                glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
-                glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
-        lightRect->applyMatrixTransformation(rotate);
-
-        scene.addSceneObject(lightRect);
-
-        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
-        auto box = createUnitBox(bssrdf);
+        // lightRect->makeLight();
+        // auto mat = glm::scale(
+        //                 glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
+        //         glm::vec3 (1.f));
+        // auto rotate = glm::rotate(
+        //         glm::rotate(
+        //         glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
+        //         glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
+        //         glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
 
         auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
-        box->applyMatrixTransformation(matrix);
+        lightRect->setTransform(matrix);
 
-        scene.addSceneObject(box);
+        scene.addChild(lightRect);
+
+        // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        // auto box = createUnitBox(bssrdf);
+
+        // auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+        // box->setTransform(matrix);
+
+        // scene.addChild(box);
 
         scene.prepare();
     }
@@ -260,8 +262,8 @@ class LightedCube : public Scene {
         });
 
         for (auto &mesh : meshes) {
-            mesh->lightSource = mesh->mat == lightMat;
-            scene.addSceneObject(mesh);
+            // mesh->lightSource = mesh->getMaterial() == lightMat;
+            scene.addChild(mesh);
         }
 
         scene.prepare();
@@ -293,8 +295,8 @@ class ObjTest : public Scene {
         });
 
         for (auto &mesh : meshes) {
-            mesh->lightSource = mesh->mat == lightMat;
-            scene.addSceneObject(mesh);
+            // mesh->lightSource = mesh->mat == lightMat;
+            scene.addChild(mesh);
         }
 
         scene.prepare();
