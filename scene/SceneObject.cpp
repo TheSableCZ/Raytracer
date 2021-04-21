@@ -35,16 +35,19 @@ void SceneObject::addChild(const std::shared_ptr<SceneObject>& sceneObj) {
 bool SceneObject::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
     Ray actRay = ray;
     actRay.origin = glm::inverse(transform) * glm::vec4(actRay.origin, 1.0f);
-    actRay.direction = glm::inverse(transform) * glm::vec4(actRay.direction, 0.0f);
+    auto newDir = glm::inverse(transform) * glm::vec4(actRay.direction, 0.0f);
+    //std::cout << "new: " << newDir.x << "..." << newDir.y << "..." << newDir.z << std::endl;
+    actRay.direction = newDir; //glm::vec3 (newDir.x, newDir.y, newDir.z);
+    //std::cout << actRay.direction.x << "..." << actRay.direction.y << "..." << actRay.direction.z << std::endl;
     float scaleFactor = glm::length(ray.direction) / glm::length(actRay.direction);
-    actRay.direction = glm::normalize(actRay.direction);
+    //actRay.direction = glm::normalize(actRay.direction);
 
     if (accelerationDS != nullptr) {
         if (accelerationDS->intersect(actRay, tMin, tMax, intersection)) {
             intersection.point = transform * glm::vec4(intersection.point, 1.0f);
             intersection.normal = transform * glm::vec4(intersection.normal, 0.0f);
             //intersection.t *= scaleFactor;
-            intersection.t = glm::distance(ray.origin, intersection.point);
+            //intersection.t = glm::distance(ray.origin, intersection.point);
             return true;
         }
     }
@@ -72,7 +75,7 @@ std::vector<std::shared_ptr<SceneObject>> SceneObject::getLightSources(const glm
 
 std::vector<std::shared_ptr<SceneObject>> SceneObject::getLeafs() {
     if (isLeafNode() || accelerationDS != nullptr) {
-        return { std::enable_shared_from_this<SceneObject>::shared_from_this() };
+        return { shared_from_this() };
     } else {
         std::vector<std::shared_ptr<SceneObject>> res;
         for (const auto &child : children) {

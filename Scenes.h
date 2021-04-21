@@ -231,10 +231,10 @@ class BlenderTest : public Scene {
 
          auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
         auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
-         auto box = createUnitBox(red);
+         auto box = createUnitBox(bssrdf);
 
          matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
-         //box->setTransform(matrix);
+         box->setTransform(matrix);
 
          scene.addChild(box);
 

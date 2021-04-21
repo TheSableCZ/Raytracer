@@ -16,7 +16,7 @@ struct Vertex {
     glm::vec3 p, n;
 };
 
-class Polygon : public SceneObject, public std::enable_shared_from_this<Polygon> {
+class Polygon : public SceneObject {
 public:
     Polygon(const Polygon&) = default;
     Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
