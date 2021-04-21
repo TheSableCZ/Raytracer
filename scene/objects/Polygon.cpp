@@ -46,7 +46,6 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
         }
 
         intersection.objectPtr = shared_from_this();
-        intersection.materialPtr = mat;
         return true;
     }
     else // This means that there is a line intersection but not a ray intersection.
@@ -91,6 +90,7 @@ glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
 
 bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
     Intersection tempRec;
+    tempRec.materialPtr = mat;
     auto intersect = false;
     auto closestSoFar = tMax;
 
@@ -126,9 +126,9 @@ glm::vec3 PolygonMesh::randomDirection(const glm::vec3 &origin) const {
 
 std::shared_ptr<PolygonMesh> createRect(const std::shared_ptr<Material> &mat, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {
     std::vector<std::shared_ptr<Polygon>> polygons;
-    polygons.emplace_back(std::make_shared<Polygon>(p1, p2, p3, mat));
-    polygons.emplace_back(std::make_shared<Polygon>(p3, p4, p1, mat));
-    return std::make_shared<PolygonMesh>(polygons);
+    polygons.emplace_back(std::make_shared<Polygon>(p1, p2, p3));
+    polygons.emplace_back(std::make_shared<Polygon>(p3, p4, p1));
+    return std::make_shared<PolygonMesh>(polygons, mat);
 }
 
 std::shared_ptr<PolygonMesh> createUnitBox(const std::shared_ptr<Material> &mat) {
@@ -141,7 +141,7 @@ std::shared_ptr<PolygonMesh> createUnitBox(const std::shared_ptr<Material> &mat)
                 p7 = glm::vec3 (.5f, .5f, .5f),
                 p8 = glm::vec3 (-.5f, .5f, .5f);
 
-    auto mesh = std::make_shared<PolygonMesh>();
+    auto mesh = std::make_shared<PolygonMesh>(mat);
     mesh->add(createRect(mat, p2, p1, p4, p3));
     mesh->add(createRect(mat, p6, p2, p3, p7));
     mesh->add(createRect(mat, p5, p6, p7, p8));

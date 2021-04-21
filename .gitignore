@@ -5,3 +5,4 @@ cmake-build-release/
 .vscode/
 imgui.ini
 *.ppm
+*.blend1

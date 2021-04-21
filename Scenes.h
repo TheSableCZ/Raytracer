@@ -134,6 +134,8 @@ class CornellBox : public Scene {
         );
         box->applyMatrixTransformation(matrix);
         scene.addSceneObject(box);
+
+        scene.prepare();
     }
 
     void gui(bool &needReset) override {}
@@ -152,6 +154,8 @@ class CornellBox2 : public Scene {
         scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(110, 160, 350), 80, diffuse));
         scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(400, 110, 40), 80, bssrdf));
         scene.addSceneObject(std::make_shared<Sphere>(glm::vec3(170, 80, 150), 80, glass));
+
+        scene.prepare();
     }
 
     void gui(bool &needReset) override {}
@@ -188,6 +192,8 @@ class MaterialScene : public Scene {
         auto matrix = glm::scale(glm::translate(glm::mat4(1.f), glm::vec3(-10, 5, 0)), glm::vec3(10.f));
         box->applyMatrixTransformation(matrix);
         scene.addSceneObject(box);
+
+        scene.prepare();
     }
 
     void gui(bool &needReset) override {}
@@ -224,27 +230,74 @@ class BlenderTest : public Scene {
         box->applyMatrixTransformation(matrix);
 
         scene.addSceneObject(box);
+
+        scene.prepare();
     }
 
     void gui(bool &needReset) override {}
 };
 
-class ObjTest : public Scene {
+
+class LightedCube : public Scene {
     void createScene(SceneMgr &scene) override {
-        //AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
-        AppSettings::lookfrom = glm::vec3(-4, 1, 4);
+        AppSettings::lookfrom = glm::vec3(3, 3, 3);
+        // AppSettings::lookfrom = glm::vec3(-4, 1, 4);
         //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
-        AppSettings::lookat = glm::vec3(0, 0, 0);
+        AppSettings::lookat = glm::vec3(0, 1.5, 0.5);
         AppSettings::aperture = 0.f;
         AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        AppSettings::backgroundColor = glm::vec3 (0.f);
+
         scene.camera().init();
 
-        auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
-        auto meshes = ObjLoader::loadFromFile("cruiser.obj", red);
+        auto whiteMat = std::make_shared<Lambertian>(glm::vec3(.9, .9, .9));
+        auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.8, .2, .01));
+        auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_CUBESCENEDEBUG, whiteMat, {
+            {"Material.001", lightMat},
+            {"Material.003", orangeMat},
+        });
 
         for (auto &mesh : meshes) {
+            mesh->lightSource = mesh->mat == lightMat;
             scene.addSceneObject(mesh);
         }
+
+        scene.prepare();
+    }
+
+    void gui(bool &needReset) override {}
+};
+
+
+class ObjTest : public Scene {
+    void createScene(SceneMgr &scene) override {
+        AppSettings::lookfrom = glm::vec3(3, 3, 3);
+        // AppSettings::lookfrom = glm::vec3(-4, 1, 4);
+        //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
+        AppSettings::lookat = glm::vec3(0, 1, 0.2);
+        AppSettings::aperture = 0.f;
+        AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        AppSettings::backgroundColor = glm::vec3 (0.f);
+
+        scene.camera().init();
+
+        auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
+        auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_UNTITLED, redMat, {
+            {"Material.001", lightMat},
+            {"Material.003", orangeMat},
+        });
+
+        for (auto &mesh : meshes) {
+            mesh->lightSource = mesh->mat == lightMat;
+            scene.addSceneObject(mesh);
+        }
+
+        scene.prepare();
     }
 
     void gui(bool &needReset) override {}
