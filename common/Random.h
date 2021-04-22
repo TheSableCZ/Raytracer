@@ -68,9 +68,9 @@ inline glm::vec3 calculateRandomDirectionInHemisphere(glm::vec3 normal) {
     // Peter Kutz.
 
     glm::vec3 directionNotNormal;
-    if (abs(normal.x) < SQRT_OF_ONE_THIRD) {
+    if (std::abs(normal.x) < SQRT_OF_ONE_THIRD) {
         directionNotNormal = glm::vec3(1, 0, 0);
-    } else if (abs(normal.y) < SQRT_OF_ONE_THIRD) {
+    } else if (std::abs(normal.y) < SQRT_OF_ONE_THIRD) {
         directionNotNormal = glm::vec3(0, 1, 0);
     } else {
         directionNotNormal = glm::vec3(0, 0, 1);

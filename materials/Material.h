@@ -9,6 +9,8 @@
 #include "../common/Ray.h"
 #include "../common/Intersection.h"
 
+class ScatterInfo;
+
 class Material {
 public:
     virtual glm::vec3 emitted(const Ray &ray) { return glm::vec3(0); }
@@ -22,6 +24,7 @@ public:
     ) const {
         return 0;
     }
+    bool isLightSource = false;
 };
 
 class SimpleMat : public Material {

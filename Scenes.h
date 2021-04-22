@@ -89,7 +89,7 @@ private:
 };
 
 void createCornellBox(SceneMgr &scene) {
-    AppSettings::backgroundColor = glm::vec3(0.6f);
+    AppSettings::backgroundColor = glm::vec3(0.0f);
     AppSettings::lookfrom = glm::vec3 (278, 278, -800);
     AppSettings::lookat = glm::vec3 (278, 278, 0);
     AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
@@ -99,9 +99,10 @@ void createCornellBox(SceneMgr &scene) {
     auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
     auto green = std::make_shared<Lambertian>(glm::vec3(.12, .45, .15));
     auto light = std::make_shared<SimpleMat>(glm::vec3(15));
+    light->isLightSource = true;
 
     auto lightObj = createRect(light, glm::vec3(213, 554, 227), glm::vec3(343, 554, 227), glm::vec3(343, 554, 332),glm::vec3(213, 554, 332));
-    lightObj->lightSource = true;
+    // lightObj->makeLight();
     scene.addChild(lightObj);
 
     scene.addChild(createRect(green, glm::vec3(555, 0, 0), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(555, 555, 0)));
@@ -133,7 +134,7 @@ class CornellBox : public Scene {
                 glm::vec3(165, 400, 165)
         );
 
-        box->setTransform(matrix);
+        box->transform(matrix);
         scene.addChild(box);
         scene.prepare();
     }
@@ -173,6 +174,7 @@ class MaterialScene : public Scene {
         auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
         auto light = std::make_shared<SimpleMat>(glm::vec3(15, 15, 15));
+        light->isLightSource = true;
         auto glass = std::make_shared<Dielectric>(1.5);
         //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1.f, 0.2f, 0.1f));
         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
@@ -182,7 +184,7 @@ class MaterialScene : public Scene {
         scene.addChild(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0), white));
         auto lightObj = createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),
                                    glm::vec3(-10, 20, 5));
-        lightObj->lightSource = true;
+        // lightObj->makeLight();
         scene.addChild(lightObj);
 
         //scene.addChild(std::make_shared<Sphere>(glm::vec3(-10, 5, 0), 5, glass));
@@ -190,7 +192,7 @@ class MaterialScene : public Scene {
         auto box = createUnitBox(bssrdf);
         //box->applyMatrixTransformation(glm::rotate(glm::mat4(1.f), glm::radians(70.f), glm::vec3(0.f, 1.f, 0.f)));
         auto matrix = glm::scale(glm::translate(glm::mat4(1.f), glm::vec3(-10, 5, 0)), glm::vec3(10.f));
-        box->setTransform(matrix);
+        box->transform(matrix);
         scene.addChild(box);
 
         scene.prepare();
@@ -209,29 +211,30 @@ class BlenderTest : public Scene {
         scene.camera().init();
 
         auto light = std::make_shared<SimpleMat>(glm::vec3(500));
+        light->isLightSource = true;
         auto lightRect = createRect(light);
         // lightRect->makeLight();
-        // auto mat = glm::scale(
-        //                 glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
-        //         glm::vec3 (1.f));
-        // auto rotate = glm::rotate(
-        //         glm::rotate(
-        //         glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
-        //         glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
-        //         glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
+        auto mat = glm::scale(
+                        glm::translate(glm::mat4(1.f), glm::vec3(1.00545, 5.90386, 4.07625)),
+                glm::vec3 (1.f));
+        auto rotate = glm::rotate(
+                glm::rotate(
+                glm::rotate(mat, glm::radians(37.261f), glm::vec3(0.f, 0.f, 1.f)),
+                glm::radians(3.16371f), glm::vec3 (1.f, 0.f, 0.f)),
+                glm::radians(106.936f), glm::vec3 (0.f, 1.f, 0.f));
 
-        auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
-        lightRect->setTransform(matrix);
+        // auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+        lightRect->transform(rotate);
 
         scene.addChild(lightRect);
 
-        // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
-        // auto box = createUnitBox(bssrdf);
+        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        auto box = createUnitBox(bssrdf);
 
-        // auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
-        // box->setTransform(matrix);
+        auto matrix = glm::scale(glm::mat4(1.f), glm::vec3(3.f));
+        box->transform(matrix);
 
-        // scene.addChild(box);
+        scene.addChild(box);
 
         scene.prepare();
     }
@@ -255,17 +258,14 @@ class LightedCube : public Scene {
         auto whiteMat = std::make_shared<Lambertian>(glm::vec3(.9, .9, .9));
         auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.8, .2, .01));
         auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+        lightMat->isLightSource = true;
 
         auto meshes = ObjLoader::loadFromFile(RESOURCE_CUBESCENEDEBUG, whiteMat, {
             {"Material.001", lightMat},
             {"Material.003", orangeMat},
         });
 
-        for (auto &mesh : meshes) {
-            // mesh->lightSource = mesh->getMaterial() == lightMat;
-            scene.addChild(mesh);
-        }
-
+        scene.addChildren(meshes);
         scene.prepare();
     }
 
@@ -303,16 +303,14 @@ class ObjTest : public Scene {
         auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
         auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+        lightMat->isLightSource = true;
 
         auto meshes = ObjLoader::loadFromFile(RESOURCE_UNTITLED, redMat, {
             {"Material.001", lightMat},
             {"Material.003", orangeMat},
         });
 
-        for (auto &mesh : meshes) {
-            // mesh->lightSource = mesh->mat == lightMat;
-            scene.addChild(mesh);
-        }
+        scene.addChildren(meshes);
 
         //auto light = std::make_shared<SimpleMat>(glm::vec3(15, 15, 15));
         //auto lightObj = createRect(light, glm::vec3(-10, 20, -5), glm::vec3(10, 20, -5), glm::vec3(10, 20, 5),

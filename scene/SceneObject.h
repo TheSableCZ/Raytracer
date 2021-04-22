@@ -8,6 +8,8 @@
 #include "../common/Ray.h"
 #include "../common/Intersection.h"
 #include "AccelerationDS.h"
+#include "accelerationDS/LinearADS.h"
+#include "../materials/Material.h"
 
 class SceneObject : public std::enable_shared_from_this<SceneObject> {
 public:
@@ -15,36 +17,45 @@ public:
     SceneObject(std::unique_ptr<AccelerationDS> accelerationDS);
     SceneObject(const std::vector<std::shared_ptr<SceneObject>> &children, std::unique_ptr<AccelerationDS> accelerationDS = nullptr);
 
-    virtual ~SceneObject() {}
+    template<typename T>
+    SceneObject(const std::vector<std::shared_ptr<T>> &children) {
+        for (const auto &child : children) {
+            addChild(child);
+        }
+    }
 
-    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection);
-    virtual AABBValue getAABBValue() const;
-    virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) { return 0.0; }
-    virtual glm::vec3 randomDirection(const glm::vec3 &origin) const { return glm::vec3(0); }
+    // virtual ~SceneObject() {}
+
+    // virtuals methods
     virtual std::vector<std::shared_ptr<SceneObject>> getLightSources();
     virtual std::vector<std::shared_ptr<SceneObject>> getLeafs();
     virtual void prepare();
+    virtual void transform(const glm::mat4 &matrix);
+    virtual AABBValue getAABBValue() const;
 
-    bool isLeafNode() const { return children.empty(); }
-    bool isLightSource() { return isLeafNode() && lightSource; }
-
-    void setTransform(const glm::mat4 &matrix) {
-        transform = matrix;
+    // virtual inlines methods
+    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
+        return accelerationDS != nullptr
+            ? accelerationDS->intersect(ray, tMin, tMax, intersection)
+            : false;
     }
+    virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) { return 0.0; }
+    virtual glm::vec3 randomDirection(const glm::vec3 &origin) const { return glm::vec3(0); }
+
+    // non-virtual methods
+    bool isLeafNode() const { return children.empty(); }
+    bool isLightSource() const { return isLeafNode() && mat != nullptr && mat->isLightSource; }
 
     void addChild(const std::shared_ptr<SceneObject>& sceneObj);
-    void makeLight();
-
-    bool lightSource = false;
-
-    void setMaterial(const std::shared_ptr<Material> &mat) { this->mat = mat; }
+    void addChildren(const std::vector<std::shared_ptr<SceneObject>>& sceneObjs);
+    void setMaterial(const std::shared_ptr<Material> &mat);
+    // void makeLight();
 
 protected:
-    glm::mat4 transform = glm::mat4(1.0f);
-    std::vector<std::shared_ptr<SceneObject>> children;
-    std::unique_ptr<AccelerationDS> accelerationDS;
     std::shared_ptr<Material> mat;
-    std::string msg = "";
+    std::unique_ptr<AccelerationDS> accelerationDS;
+    std::vector<std::shared_ptr<SceneObject>> children;
+
 };
 
 #endif //RAYTRACER_SCENEOBJECT_H

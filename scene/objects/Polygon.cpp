@@ -53,7 +53,7 @@ bool Polygon::intersect(const Ray &ray, float tMin, float tMax, Intersection &in
         return false;
 }
 
-void Polygon::applyMatrixTransformation(glm::mat4 matrix) {
+void Polygon::transform(const glm::mat4& matrix) {
     glm::vec4 tmp_4;
     tmp_4 = matrix * glm::vec4 (p1.p, 1.f);
     p1.p = glm::vec3 (tmp_4 / tmp_4.w);
@@ -65,7 +65,7 @@ void Polygon::applyMatrixTransformation(glm::mat4 matrix) {
     p3.p = glm::vec3 (tmp_4 / tmp_4.w);
 }
 
-float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v)  {
     Intersection intersection;
     if (!this->intersect(Ray(origin, v), AppSettings::tMin, AppSettings::tMax, intersection))
         return 0;
@@ -89,50 +89,16 @@ glm::vec3 Polygon::randomDirection(const glm::vec3 &origin) const {
     return randomPoint - origin;
 }
 
-// bool PolygonMesh::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
-//     Intersection tempRec;
-//     tempRec.materialPtr = mat;
-//     auto intersect = false;
-//     auto closestSoFar = tMax;
-
-//     for (const auto& polygon : polygons) {
-//         if (polygon->intersect(ray, tMin, closestSoFar, tempRec)) {
-//             intersect = true;
-//             closestSoFar = tempRec.t;
-//             intersection = tempRec;
-//         }
-//     }
-
-//     return intersect;
-// }
-
-// float PolygonMesh::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
-//     auto weight = 1.0/polygons.size();
-//     auto sum = 0.0;
-
-//     for (const auto &polygon : polygons)
-//         sum += weight * polygon->pdfValue(origin, v);
-
-//     return sum;
-// }
-
-// glm::vec3 PolygonMesh::randomDirection(const glm::vec3 &origin) const {
-//     auto int_size = static_cast<int>(polygons.size());
-//     if (int_size > 0) {
-//         auto randIdx = randomInt(0, int_size - 1);
-//         return polygons[randIdx]->randomDirection(origin);
-//     }
-//     return glm::vec3 (0.f);
-// }
-
-std::shared_ptr<PolygonMesh> createRect(const std::shared_ptr<Material> &mat, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {
+std::shared_ptr<SceneObject> createRect(const std::shared_ptr<Material> &mat, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 p4) {
     std::vector<std::shared_ptr<Polygon>> polygons;
     polygons.emplace_back(std::make_shared<Polygon>(p1, p2, p3));
     polygons.emplace_back(std::make_shared<Polygon>(p3, p4, p1));
-    return std::make_shared<PolygonMesh>(polygons, mat);
+    auto obj = std::make_shared<SceneObject>(polygons);
+    obj->setMaterial(mat);
+    return obj;
 }
 
-std::shared_ptr<PolygonMesh> createUnitBox(const std::shared_ptr<Material> &mat) {
+std::shared_ptr<SceneObject> createUnitBox(const std::shared_ptr<Material> &mat) {
     glm::vec3   p1 = glm::vec3 (-.5f, -.5f, -.5f),
                 p2 = glm::vec3 (.5f, -.5f, -.5f),
                 p3 = glm::vec3 (.5f, .5f, -.5f),
@@ -142,13 +108,14 @@ std::shared_ptr<PolygonMesh> createUnitBox(const std::shared_ptr<Material> &mat)
                 p7 = glm::vec3 (.5f, .5f, .5f),
                 p8 = glm::vec3 (-.5f, .5f, .5f);
 
-    auto mesh = std::make_shared<PolygonMesh>(mat);
-    mesh->add(createRect(mat, p2, p1, p4, p3));
-    mesh->add(createRect(mat, p6, p2, p3, p7));
-    mesh->add(createRect(mat, p5, p6, p7, p8));
-    mesh->add(createRect(mat, p1, p5, p8, p4));
-    mesh->add(createRect(mat, p1, p2, p6, p5));
-    mesh->add(createRect(mat, p3, p4, p8, p7));
+    auto mesh = std::make_shared<SceneObject>();
+    mesh->addChild(createRect(mat, p2, p1, p4, p3));
+    mesh->addChild(createRect(mat, p6, p2, p3, p7));
+    mesh->addChild(createRect(mat, p5, p6, p7, p8));
+    mesh->addChild(createRect(mat, p1, p5, p8, p4));
+    mesh->addChild(createRect(mat, p1, p2, p6, p5));
+    mesh->addChild(createRect(mat, p3, p4, p8, p7));
+    mesh->setMaterial(mat);
 
     return mesh;
 }

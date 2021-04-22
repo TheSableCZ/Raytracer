@@ -4,6 +4,7 @@
 
 #include "SceneObject.h"
 #include <iostream>
+#include <algorithm>
 
 SceneObject::SceneObject(std::unique_ptr<AccelerationDS> accelerationDS) : accelerationDS(std::move(accelerationDS)) {
 
@@ -30,32 +31,23 @@ void SceneObject::prepare() {
 
 void SceneObject::addChild(const std::shared_ptr<SceneObject>& sceneObj) {
     children.emplace_back(sceneObj);
+    if (mat != nullptr) {
+        children.back()->setMaterial(mat);
+    }
 }
 
-bool SceneObject::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
-    Ray actRay = ray;
-    actRay.origin = glm::inverse(transform) * glm::vec4(actRay.origin, 1.0f);
-    actRay.direction = glm::inverse(transform) * glm::vec4(actRay.direction, 0.0f);
-    float scaleFactor = glm::length(ray.direction) / glm::length(actRay.direction);
-    actRay.direction = glm::normalize(actRay.direction);
-
-    if (msg != "") {
-        std::cout << "crrr...";
+void SceneObject::addChildren(const std::vector<std::shared_ptr<SceneObject>>& sceneObjs) {
+    for (const auto& child : sceneObjs) {
+        addChild(child);
     }
-
-    if (accelerationDS != nullptr) {
-        if (accelerationDS->intersect(actRay, tMin, tMax, intersection)) {
-            intersection.point = transform * glm::vec4(intersection.point, 1.0f);
-            intersection.normal = transform * glm::vec4(intersection.normal, 1.0f);
-            intersection.t *= scaleFactor;
-            return true;
-        }
-    }
-    return false;
 }
 
 AABBValue SceneObject::getAABBValue() const {
-    return {};
+    AABBValue res = {};
+    for (const auto& child : children) {
+        res = res.combine(child->getAABBValue());
+    }
+    return res;
 }
 
 std::vector<std::shared_ptr<SceneObject>> SceneObject::getLightSources() {
@@ -84,12 +76,25 @@ std::vector<std::shared_ptr<SceneObject>> SceneObject::getLeafs() {
     }
 }
 
-void SceneObject::makeLight() {
-    if (isLeafNode()) {
-        lightSource = true;
-    } else {
-        for (const auto &child : children) {
-            child->makeLight();
-        }
+// void SceneObject::makeLight() {
+//     if (isLeafNode()) {
+//         lightSource = true;
+//     } else {
+//         for (const auto &child : children) {
+//             child->makeLight();
+//         }
+//     }
+// }
+
+void SceneObject::transform(const glm::mat4 &matrix) {
+    for (const auto &child : children) {
+        child->transform(matrix);
+    }
+}
+
+void SceneObject::setMaterial(const std::shared_ptr<Material> &mat) {
+    this->mat = mat;
+    for (const auto &child : children) {
+        child->setMaterial(mat);
     }
 }

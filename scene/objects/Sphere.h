@@ -10,7 +10,7 @@
 class Sphere : public SceneObject {
 public:
     Sphere(glm::vec3 center, float radius, std::shared_ptr<Material> mat) : SceneObject(), center(center), radius(radius), mat(std::move(mat)) {}
-    bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
+    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
 
 private:
     glm::vec3 center;

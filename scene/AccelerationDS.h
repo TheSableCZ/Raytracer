@@ -18,6 +18,9 @@ struct AABBValue {
     glm::vec3 maxPos = glm::vec3(0);
 
     bool isIntersecting(const Ray &ray) const { return false; }
+    AABBValue combine(const AABBValue& val) const {
+        return AABBValue{ glm::min(minPos, val.minPos), glm::max(maxPos, val.maxPos) };
+    }
 };
 
 /**

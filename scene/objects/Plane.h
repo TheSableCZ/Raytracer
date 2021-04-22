@@ -13,7 +13,7 @@ class Plane : public SceneObject {
 public:
     Plane(glm::vec3 normal, glm::vec3 point, std::shared_ptr<Material> mat)
         : SceneObject(), n(normalize(normal)), d(-(dot(n,point))), mat(std::move(mat)) {}
-    bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
+    virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
 
 private:
     glm::vec3 n;
