@@ -11,6 +11,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include "RenderStatistics.h"
 
 class Scene;
 
@@ -57,6 +58,9 @@ private:
     int current_ac_technique = 0;
     glm::vec3 backgroundColor;
     char filename[30] = "image.ppm";
+
+    RenderStatistics statistic;
+    Measurement prepareTime;
 };
 
 std::string const vsSrc = R".(

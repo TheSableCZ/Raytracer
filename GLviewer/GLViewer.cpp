@@ -6,6 +6,7 @@
 #include "../Scenes.h"
 #include "Utils.h"
 #include <iostream>
+#include <stdio.h>
 
 #include "../lib/imgui/imgui.h"
 #include "../lib/imgui/imgui_impl_sdl.h"
@@ -72,20 +73,51 @@ void GLViewer::run() {
         updateBuffer();
 
         ImGui::Begin("Raytracer");
-        ImGui::Text("Current samples per pixel = %d", renderedSamples);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
-        if (ImGui::InputFloat("Distance to focus", &AppSettings::distToFocus, 1.f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
-        if (ImGui::InputFloat("Aperture", &AppSettings::aperture, 0.1f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
+        ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+        { // statistics
+            std::vector<float> samples;
+            samples.resize(RenderStatistics::HISTORY_LEN, 0.0f);
+            int histIndex = RenderStatistics::HISTORY_LEN - 1;
+            int dataIndex = statistic.getSampleCount() - (statistic.isMeasuring() ? 2 : 1);
+            while (histIndex >= 0 && dataIndex > 0) {
+                samples[histIndex] = statistic.getData()[dataIndex].getSeconds();
+                --histIndex;
+                --dataIndex;
+            }
+
+            ImGui::PlotLines("", samples.data(), RenderStatistics::HISTORY_LEN);
+            ImGui::Text("Samples = %d", renderedSamples);
+            ImGui::Text("Last sample time: %g s", statistic.getLastSecods());
+            ImGui::Text("Average time: %g s", statistic.getAverageTime());
+            ImGui::Text("Scene prepare time = %g s", prepareTime.finished ? prepareTime.getSeconds() : 0);
+            ImGui::Separator();
+        }
+
+        ImGui::Text("Distance to focus:");
+        if (ImGui::InputFloat("", &AppSettings::distToFocus, 1.f)) {
+            raytracer->initCameraWithAppSettings(); needReset = true;
+        }
+        ImGui::Text("Aperture:");
+        if (ImGui::InputFloat("", &AppSettings::aperture, 0.1f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
+
+        ImGui::Separator();
+
         bool ambient = AppSettings::backgroundColor != glm::vec3 (0.f);
+        // ImGui::InputText("", filename, 30); ImGui::SameLine();
+        // if (ImGui::Button("Save")) { needSaveToFile = true; }
+        if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
         if (ImGui::Checkbox("Ambient light", &ambient)) { AppSettings::backgroundColor = ambient ? backgroundColor : glm::vec3 (0.f); needReset = true; }
-        ImGui::InputText("", filename, 30); ImGui::SameLine();
-        if (ImGui::Button("Save")) { needSaveToFile = true; }
         if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
         if (ImGui::Checkbox("Enable lights direct sampling", &AppSettings::lightsDirectSampling)) needReset = true;
 
+        ImGui::Separator();
+
         const char* items[] = { "Linear", "SimpleAABB 1 LvL" };
-        ImGui::ListBox("Acceleration\ntechnique", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+        ImGui::Text("Acceleration technique:");
+        ImGui::ListBox("", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+
+        ImGui::Separator();
 
         if (ImGui::Button("Next scene")) {
             selectedScene = (selectedScene + 1) % (scenes.size());
@@ -136,7 +168,10 @@ void GLViewer::render() {
         unsigned _selectedScene = selectedScene;
         unsigned _current_ac_technique = current_ac_technique;
 
+        statistic.start();
         raytracer->renderStage(*colBuff, AppSettings::imgWidth, AppSettings::imgHeight);
+        statistic.end();
+
         renderedSamples++;
 
         if (_selectedScene != selectedScene || _current_ac_technique != current_ac_technique) {
@@ -147,6 +182,7 @@ void GLViewer::render() {
         if (needReset) {
             colBuff->clear();
             renderedSamples = 0;
+            statistic.resetAverage();
             needReset = false;
         }
 
@@ -247,5 +283,7 @@ GLViewer::~GLViewer() {
 
 void GLViewer::initSelectedScene() {
     raytracer->clearScene();
+    prepareTime = Measurement();
     scenes[selectedScene]->createScene(*raytracer->scene(), current_ac_technique);
+    prepareTime.stop();
 }

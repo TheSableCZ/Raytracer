@@ -75,6 +75,8 @@ add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
 
     GLviewer/GLViewer.cpp
     GLviewer/GLViewer.h
+    GLviewer/RenderStatistics.cpp
+    GLviewer/RenderStatistics.h
     GLviewer/Utils.h
 
     scene/SceneMgr.cpp
