@@ -91,6 +91,10 @@ add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
     scene/AccelerationDS.h
         scene/accelerationDS/LinearADS.h
         scene/accelerationDS/LinearADS.cpp
+        scene/accelerationDS/AABBSimpleADS.h
+        scene/accelerationDS/AABBSimpleADS.cpp
+    scene/AABB.h
+    scene/AABB.cpp
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

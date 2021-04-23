@@ -32,3 +32,11 @@ bool Sphere::intersect(const Ray &ray, float tMin, float tMax, Intersection &int
 
     return true;
 }
+
+AABB Sphere::getAABB() const {
+    auto radiusVec = glm::vec3(radius);
+    return AABB(
+        center - radiusVec,
+        center + radiusVec
+    );
+}

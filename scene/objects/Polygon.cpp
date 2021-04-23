@@ -119,3 +119,10 @@ std::shared_ptr<SceneObject> createUnitBox(const std::shared_ptr<Material> &mat)
 
     return mesh;
 }
+
+AABB Polygon::getAABB() const {
+    return AABB(
+        glm::min(p1.p, glm::min(p2.p, p3.p)),
+        glm::max(p1.p, glm::max(p2.p, p3.p))
+    );
+}

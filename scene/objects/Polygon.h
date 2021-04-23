@@ -34,6 +34,7 @@ public:
     virtual void transform(const glm::mat4 &matrix) override;
     virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override;
     virtual glm::vec3 randomDirection(const glm::vec3 &origin) const override;
+    virtual AABB getAABB() const override;
 
 private:
     Vertex p1;

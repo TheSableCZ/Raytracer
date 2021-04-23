@@ -24,14 +24,12 @@ public:
         }
     }
 
-    // virtual ~SceneObject() {}
-
     // virtuals methods
     virtual std::vector<std::shared_ptr<SceneObject>> getLightSources();
     virtual std::vector<std::shared_ptr<SceneObject>> getLeafs();
     virtual void prepare();
     virtual void transform(const glm::mat4 &matrix);
-    virtual AABBValue getAABBValue() const;
+    virtual AABB getAABB() const;
 
     // virtual inlines methods
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
@@ -45,11 +43,14 @@ public:
     // non-virtual methods
     bool isLeafNode() const { return children.empty(); }
     bool isLightSource() const { return isLeafNode() && mat != nullptr && mat->isLightSource; }
+    const std::vector<std::shared_ptr<SceneObject>> &getChildren() { return children; }
+    bool hasAccelerationDS() { return accelerationDS != nullptr; }
 
     void addChild(const std::shared_ptr<SceneObject>& sceneObj);
     void addChildren(const std::vector<std::shared_ptr<SceneObject>>& sceneObjs);
     void setMaterial(const std::shared_ptr<Material> &mat);
-    // void makeLight();
+
+    void setAccelerationDS(std::unique_ptr<AccelerationDS> ds) { accelerationDS = std::move(ds); }
 
 protected:
     std::shared_ptr<Material> mat;

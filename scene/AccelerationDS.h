@@ -7,21 +7,9 @@
 #include <vector>
 #include <memory>
 #include <glm/glm.hpp>
+#include "AABB.h"
 #include "../common/Ray.h"
 #include "../common/Intersection.h"
-
-/**
- * @brief An axis- aligned bounding box data
- */
-struct AABBValue {
-    glm::vec3 minPos = glm::vec3(0);
-    glm::vec3 maxPos = glm::vec3(0);
-
-    bool isIntersecting(const Ray &ray) const { return false; }
-    AABBValue combine(const AABBValue& val) const {
-        return AABBValue{ glm::min(minPos, val.minPos), glm::max(maxPos, val.maxPos) };
-    }
-};
 
 /**
  * @brief Acceleration datastructure of spacial objects

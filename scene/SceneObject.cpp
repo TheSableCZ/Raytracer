@@ -42,10 +42,10 @@ void SceneObject::addChildren(const std::vector<std::shared_ptr<SceneObject>>& s
     }
 }
 
-AABBValue SceneObject::getAABBValue() const {
-    AABBValue res = {};
+AABB SceneObject::getAABB() const {
+    AABB res = {};
     for (const auto& child : children) {
-        res = res.combine(child->getAABBValue());
+        res = res.combine(child->getAABB());
     }
     return res;
 }
@@ -75,16 +75,6 @@ std::vector<std::shared_ptr<SceneObject>> SceneObject::getLeafs() {
         return res;
     }
 }
-
-// void SceneObject::makeLight() {
-//     if (isLeafNode()) {
-//         lightSource = true;
-//     } else {
-//         for (const auto &child : children) {
-//             child->makeLight();
-//         }
-//     }
-// }
 
 void SceneObject::transform(const glm::mat4 &matrix) {
     for (const auto &child : children) {

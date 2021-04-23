@@ -54,6 +54,7 @@ private:
 
     std::vector<std::shared_ptr<Scene>> scenes;
     unsigned selectedScene = 0;
+    int current_ac_technique = 0;
     glm::vec3 backgroundColor;
     char filename[30] = "image.ppm";
 };

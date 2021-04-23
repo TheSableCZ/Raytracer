@@ -16,17 +16,18 @@
 #include "materials/BSSRDF.h"
 #include "scene/objects/ObjLoader.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "scene/accelerationDS/AABBSimpleADS.h"
 
 class Scene {
 public:
-    virtual void createScene(SceneMgr &scene) = 0;
+    virtual void createScene(SceneMgr &scene, int current_ac_technique) = 0;
 
     virtual void gui(bool &needReset) = 0;
 };
 
 class SimpleScene : public Scene {
 public:
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         /* DEPRECATED
          *
         light = std::make_shared<SimpleMat>(glm::vec3(4));
@@ -102,7 +103,6 @@ void createCornellBox(SceneMgr &scene) {
     light->isLightSource = true;
 
     auto lightObj = createRect(light, glm::vec3(213, 554, 227), glm::vec3(343, 554, 227), glm::vec3(343, 554, 332),glm::vec3(213, 554, 332));
-    // lightObj->makeLight();
     scene.addChild(lightObj);
 
     scene.addChild(createRect(green, glm::vec3(555, 0, 0), glm::vec3(555, 0, 555), glm::vec3(555, 555, 555),glm::vec3(555, 555, 0)));
@@ -119,8 +119,22 @@ void createCornellBox(SceneMgr &scene) {
     //scene.addChild(std::make_shared<Plane>(glm::vec3(0, 0, 1), glm::vec3(0, 0, 555), white));
 }
 
+void ApplyACTechnique(SceneMgr &scene, int technique) {
+    if (technique == 1) { // AABBSimpleADS
+        for (const auto &child : scene.getChildren()) {
+            if (!child->isLeafNode() && !child->hasAccelerationDS()) {
+                child->setAccelerationDS(std::make_unique<LinearADS>());
+            }
+        }
+        scene.setAccelerationDS(std::make_unique<AABBSimpleADS>());
+        scene.prepare();
+    } else {
+        scene.prepare();
+    }
+}
+
 class CornellBox : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         createCornellBox(scene);
 
         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.6f, .6f, 1.f), .02f);
@@ -136,14 +150,14 @@ class CornellBox : public Scene {
 
         box->transform(matrix);
         scene.addChild(box);
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class CornellBox2 : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         createCornellBox(scene);
 
         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.4f, .1f, 6.f), .2f);
@@ -156,14 +170,14 @@ class CornellBox2 : public Scene {
         scene.addChild(std::make_shared<Sphere>(glm::vec3(400, 110, 40), 80, bssrdf));
         scene.addChild(std::make_shared<Sphere>(glm::vec3(170, 80, 150), 80, glass));
 
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class MaterialScene : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         AppSettings::backgroundColor = glm::vec3(0.7f, 0.8f, 1.f);
         AppSettings::lookfrom = glm::vec3(0, 15, 50);
         AppSettings::lookat = glm::vec3(0, 5, 0);
@@ -195,14 +209,14 @@ class MaterialScene : public Scene {
         box->transform(matrix);
         scene.addChild(box);
 
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class BlenderTest : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         AppSettings::backgroundColor = glm::vec3(0.051f, 0.051f, 0.051f);
         AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
         AppSettings::lookat = glm::vec3(0, 0, 0);
@@ -236,7 +250,7 @@ class BlenderTest : public Scene {
 
         scene.addChild(box);
 
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
     }
 
     void gui(bool &needReset) override {}
@@ -244,7 +258,7 @@ class BlenderTest : public Scene {
 
 
 class LightedCube : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         AppSettings::lookfrom = glm::vec3(3, 3, 3);
         // AppSettings::lookfrom = glm::vec3(-4, 1, 4);
         //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
@@ -266,7 +280,7 @@ class LightedCube : public Scene {
         });
 
         scene.addChildren(meshes);
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
     }
 
     void gui(bool &needReset) override {}
@@ -274,7 +288,7 @@ class LightedCube : public Scene {
 
 
 class ObjTest : public Scene {
-    void createScene(SceneMgr &scene) override {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
         //AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
         //AppSettings::lookfrom = glm::vec3(-3, 3, 3);
         AppSettings::lookfrom = glm::vec3(3, 3, 3);
@@ -320,7 +334,7 @@ class ObjTest : public Scene {
 
         //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0, -1.f, 0), white));
 
-        scene.prepare();
+        ApplyACTechnique(scene, current_ac_technique);
 
     }
 

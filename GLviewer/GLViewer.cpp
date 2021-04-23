@@ -83,6 +83,10 @@ void GLViewer::run() {
         if (ImGui::Button("Save")) { needSaveToFile = true; }
         if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
         if (ImGui::Checkbox("Enable lights direct sampling", &AppSettings::lightsDirectSampling)) needReset = true;
+
+        const char* items[] = { "Linear", "SimpleAABB 1 LvL" };
+        ImGui::ListBox("Acceleration\ntechnique", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+
         if (ImGui::Button("Next scene")) {
             selectedScene = (selectedScene + 1) % (scenes.size());
         }
@@ -130,11 +134,12 @@ void GLViewer::initRaytracer() {
 void GLViewer::render() {
     while (true) {
         unsigned _selectedScene = selectedScene;
+        unsigned _current_ac_technique = current_ac_technique;
 
         raytracer->renderStage(*colBuff, AppSettings::imgWidth, AppSettings::imgHeight);
         renderedSamples++;
 
-        if (_selectedScene != selectedScene) {
+        if (_selectedScene != selectedScene || _current_ac_technique != current_ac_technique) {
             initSelectedScene();
             needReset = true;
         }
@@ -242,5 +247,5 @@ GLViewer::~GLViewer() {
 
 void GLViewer::initSelectedScene() {
     raytracer->clearScene();
-    scenes[selectedScene]->createScene(*raytracer->scene());
+    scenes[selectedScene]->createScene(*raytracer->scene(), current_ac_technique);
 }
