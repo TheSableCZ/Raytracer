@@ -95,11 +95,9 @@ void GLViewer::run() {
         }
 
         ImGui::Text("Distance to focus:");
-        if (ImGui::InputFloat("", &AppSettings::distToFocus, 1.f)) {
-            raytracer->initCameraWithAppSettings(); needReset = true;
-        }
+        if (ImGui::InputFloat("###1", &AppSettings::distToFocus, 1.f)) {raytracer->scene()->camera().init(); needReset = true; }
         ImGui::Text("Aperture:");
-        if (ImGui::InputFloat("", &AppSettings::aperture, 0.1f)) { raytracer->initCameraWithAppSettings(); needReset = true; }
+        if (ImGui::InputFloat("###2", &AppSettings::aperture, 0.1f)) { raytracer->scene()->camera().init(); needReset = true; }
 
         ImGui::Separator();
 
@@ -115,7 +113,7 @@ void GLViewer::run() {
 
         const char* items[] = { "Linear", "SimpleAABB 1 LvL" };
         ImGui::Text("Acceleration technique:");
-        ImGui::ListBox("", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+        ImGui::ListBox("###3", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
 
         ImGui::Separator();
 

@@ -42,9 +42,8 @@ public:
     void start();
     void end();
 
-    void reset() { data.clear(); lastFinishedMeasurement = nullptr; }
-    unsigned long getLastFrameDuration() { return lastFinishedMeasurement != nullptr ? lastFinishedMeasurement->getMiliseconds() : 0; }
-    float getLastSecods() { return lastFinishedMeasurement != nullptr ? lastFinishedMeasurement->getSeconds() : 0.0f; }
+    void reset() { data.clear(); }
+    float getLastSecods() { return lastDuration; }
     float getSampleCount() { return data.size(); }
     float getAverageTime() { return averageTime; }
     bool isMeasuring() { return !data.back().finished; }
@@ -53,9 +52,9 @@ public:
 
 private:
     std::vector<Measurement> data;
-    Measurement *lastFinishedMeasurement = nullptr;
+    float lastDuration = 0.0f;
     float averageTime = 0.0f;
     int averageCounting = 0;
 
-    void accountMeasurement(Measurement m);
+    void accountMeasurement(float seconds);
 };

@@ -21,8 +21,6 @@ public:
     void renderStage(ColorBuffer &colorBuffer, int width, int height);
     static glm::vec3 pixelColorOperation(glm::vec3 pixelColor, int samplesPerPixel);
 
-    void initCameraWithAppSettings();
-
     std::shared_ptr<SceneMgr>& scene() { return sceneMgr; }
     void clearScene() { sceneMgr = std::make_shared<SceneMgr>(); sceneMgr->camera().init(); }
 

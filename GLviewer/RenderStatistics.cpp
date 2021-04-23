@@ -11,15 +11,15 @@ void RenderStatistics::start() {
 
 void RenderStatistics::end() {
     if (!data.empty()) {
-        lastFinishedMeasurement = &data.back();
-        lastFinishedMeasurement->stop();
-        accountMeasurement(*lastFinishedMeasurement);
+        data.back().stop();
+        lastDuration = data.back().getSeconds();
+        accountMeasurement(lastDuration);
     }
 }
 
-void RenderStatistics::accountMeasurement(Measurement m) {
+void RenderStatistics::accountMeasurement(float seconds) {
     averageTime = averageCounting > 0
-        ? averageTime + ((m.getSeconds() - averageTime) / float(averageCounting))
-        : m.getSeconds();
+        ? averageTime + ((seconds - averageTime) / float(averageCounting))
+        : seconds;
     ++averageCounting;
 }

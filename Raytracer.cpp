@@ -9,7 +9,7 @@
 #include "materials/Material.h"
 
 Raytracer::Raytracer() {
-    initCameraWithAppSettings();
+    clearScene();
 }
 
 glm::vec3 Raytracer::trace(const Ray &ray, int depth, int colorChannel) {
@@ -111,9 +111,4 @@ glm::vec3 Raytracer::pixelColorOperation(glm::vec3 pixelColor, int samplesPerPix
     auto scale = 1.f / static_cast<float>(samplesPerPixel);
     pixelColor = deNan(pixelColor);
     return clampColorWithRatio(glm::vec3(sqrt(pixelColor.r * scale), sqrt(pixelColor.g * scale), sqrt(pixelColor.b * scale)));
-}
-
-void Raytracer::initCameraWithAppSettings() {
-    sceneMgr = std::make_shared<SceneMgr>();
-    scene()->camera().init();
 }
