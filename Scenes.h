@@ -17,6 +17,7 @@
 #include "scene/objects/ObjLoader.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "scene/accelerationDS/AABBSimpleADS.h"
+#include "scene/accelerationDS/OctreeADS.h"
 
 class Scene {
 public:
@@ -127,6 +128,9 @@ void ApplyACTechnique(SceneMgr &scene, int technique) {
             }
         }
         scene.setAccelerationDS(std::make_unique<AABBSimpleADS>());
+        scene.prepare();
+    } else if (technique == 2) {
+        scene.setAccelerationDS(std::make_unique<OctreeADS>());
         scene.prepare();
     } else {
         scene.prepare();
@@ -305,7 +309,8 @@ class ObjTest : public Scene {
         //auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
         //auto glass = std::make_shared<Dielectric>(1.5);
         //auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.3f);
-        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.6f, .6f, 1.f), .02f);
+        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (.2f, .8f, .2f), glm::vec3(0.02f));
 
         //std::unordered_map<std::string, std::shared_ptr<Material>> mats;
         //mats.insert(std::pair("glass", glass));
@@ -319,7 +324,7 @@ class ObjTest : public Scene {
         auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
         lightMat->isLightSource = true;
 
-        auto meshes = ObjLoader::loadFromFile(RESOURCE_UNTITLED, redMat, {
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_UNTITLED, bssrdf, {
             {"Material.001", lightMat},
             {"Material.003", orangeMat},
         });
@@ -333,6 +338,42 @@ class ObjTest : public Scene {
         //scene.addSceneObject(lightObj);
 
         //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0, -1.f, 0), white));
+
+        ApplyACTechnique(scene, current_ac_technique);
+
+    }
+
+    void gui(bool &needReset) override {}
+};
+
+class Bunny : public Scene {
+    void createScene(SceneMgr &scene, int current_ac_technique) override {
+        AppSettings::lookfrom = glm::vec3(3, 3, 3);
+        AppSettings::lookat = glm::vec3(0, 1, 0.2);
+        AppSettings::aperture = 0.f;
+        AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        AppSettings::backgroundColor = glm::vec3 (0.f);
+
+        scene.camera().init();
+
+        //auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        //auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
+        //auto glass = std::make_shared<Dielectric>(1.5);
+        //auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.3f);
+        //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
+        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (.2f, .8f, .2f), glm::vec3(0.02f));
+
+        auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
+        auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+        lightMat->isLightSource = true;
+
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_BUNNY_SCENE, redMat, {
+                {"Material.001", lightMat},
+                {"Material.003", orangeMat},
+        });
+
+        scene.addChildren(meshes);
 
         ApplyACTechnique(scene, current_ac_technique);
 
