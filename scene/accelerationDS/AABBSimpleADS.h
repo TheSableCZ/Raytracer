@@ -8,12 +8,11 @@
 #include <vector>
 #include "../SceneObject.h"
 #include "../AccelerationDS.h"
+#include <algorithm>
 
 struct AABBSimpleADS_node {
-    AABBSimpleADS_node(const std::shared_ptr<SceneObject>& obj) {
-        this->obj = obj;
-        bb = obj->getAABB();
-    }
+    AABBSimpleADS_node(const std::shared_ptr<SceneObject> &obj)
+        : obj(obj), bb(obj->getAABB()) {}
     AABB bb;
     std::shared_ptr<SceneObject> obj;
 };
@@ -34,7 +33,7 @@ public:
 
     virtual void insert(const std::vector<std::shared_ptr<SceneObject>> &objects) override {
         std::transform(objects.begin(), objects.end(), std::back_inserter(nodes),
-            [](const std::shared_ptr<SceneObject>& c) -> AABBSimpleADS_node { return AABBSimpleADS_node(c); }
+            [](const std::shared_ptr<SceneObject> &c) -> AABBSimpleADS_node { return AABBSimpleADS_node(c); }
         );
     };
 

@@ -43,8 +43,9 @@ public:
     // non-virtual methods
     bool isLeafNode() const { return children.empty(); }
     bool isLightSource() const { return isLeafNode() && mat != nullptr && mat->isLightSource; }
-    const std::vector<std::shared_ptr<SceneObject>> &getChildren() { return children; }
     bool hasAccelerationDS() { return accelerationDS != nullptr; }
+    const std::vector<std::shared_ptr<SceneObject>> &getChildren() { return children; }
+    const AccelerationDS &getAccelerationDS() const { return *accelerationDS; }
 
     void addChild(const std::shared_ptr<SceneObject>& sceneObj);
     void addChildren(const std::vector<std::shared_ptr<SceneObject>>& sceneObjs);
@@ -53,6 +54,7 @@ public:
     void setAccelerationDS(std::unique_ptr<AccelerationDS> ds) { accelerationDS = std::move(ds); }
     AccelerationDS &getADSRef() { return *accelerationDS; }
 
+    unsigned long countPrimitives() const;
 protected:
     std::shared_ptr<Material> mat;
     std::unique_ptr<AccelerationDS> accelerationDS;

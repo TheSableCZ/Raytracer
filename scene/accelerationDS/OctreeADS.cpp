@@ -10,7 +10,7 @@
 void OctreeADS::insert(const std::vector<std::shared_ptr<SceneObject>> &object) {
     AABB topLevel = {};
     for (const auto& obj : object) {
-        topLevel = topLevel.combine(obj->getAABB());
+        topLevel = topLevel + obj->getAABB();
     }
 
     /*auto xmin = topLevel.minPos.x, xmax = topLevel.maxPos.x, ymin = topLevel.minPos.y, ymax = topLevel.maxPos.y,

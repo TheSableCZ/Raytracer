@@ -43,9 +43,9 @@ void SceneObject::addChildren(const std::vector<std::shared_ptr<SceneObject>>& s
 }
 
 AABB SceneObject::getAABB() const {
-    AABB res = {};
+    AABB res = AABB();
     for (const auto& child : children) {
-        res = res.combine(child->getAABB());
+        res = res + child->getAABB();
     }
     return res;
 }
@@ -87,4 +87,15 @@ void SceneObject::setMaterial(const std::shared_ptr<Material> &mat) {
     for (const auto &child : children) {
         child->setMaterial(mat);
     }
+}
+
+unsigned long SceneObject::countPrimitives() const {
+    if (isLeafNode()) {
+        return 1;
+    }
+    unsigned long resCount = 0;
+    for (const auto &child : children) {
+        resCount += child->countPrimitives();
+    }
+    return resCount;
 }

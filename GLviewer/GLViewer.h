@@ -40,6 +40,7 @@ private:
     int renderedSamples = 0;
     bool needReset = false;
     bool needSaveToFile = false;
+    bool neednewScene = false;
 
     GLuint programId;
     GLuint bufferId;
@@ -54,13 +55,15 @@ private:
     bool renderStageCompleted = false;
 
     std::vector<std::shared_ptr<Scene>> scenes;
-    unsigned selectedScene = 0;
-    int current_ac_technique = 2;
+    int selectedScene = 0;
+    int current_ac_technique = 0;
     glm::vec3 backgroundColor;
     char filename[30] = "image.ppm";
 
     RenderStatistics statistic;
     Measurement prepareTime;
+    unsigned long actPrimitiveCount = 0;
+    int bvh_leaf_node_capacity = 2;
 };
 
 std::string const vsSrc = R".(
