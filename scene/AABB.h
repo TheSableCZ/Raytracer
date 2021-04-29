@@ -37,4 +37,10 @@ struct AABB {
     }
 
     bool isIntersecting(const Ray &ray, float tMin, float tMax);
+
+    bool bbInside(const AABB &aabb) const {
+        return
+            glm::all(glm::lessThanEqual(minPos, aabb.maxPos))
+            && glm::all(glm::greaterThanEqual(maxPos, aabb.minPos));
+    }
 };

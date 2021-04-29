@@ -31,4 +31,6 @@ inline glm::vec3 deNan(glm::vec3 color) {
     return color;
 }
 
+constexpr float eps = 0.000001;
+
 #endif //RAYTRACER_MATHUTILS_H

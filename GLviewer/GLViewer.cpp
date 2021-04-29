@@ -114,7 +114,7 @@ void GLViewer::run() {
 
         ImGui::Separator();
 
-        const char* items[] = { "Linear", "SimpleAABB 1 LvL" };
+        const char* items[] = { "Linear", "SimpleAABB 1 LvL", "Octree" };
         ImGui::Text("Acceleration technique:");
         ImGui::ListBox("###3", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
 
@@ -225,12 +225,13 @@ void GLViewer::initGLObjects() {
 
 void GLViewer::initScenes() {
     // scenes.emplace_back(std::make_shared<SimpleScene>());
-    scenes.emplace_back(std::make_shared<CornellBox>());
-    scenes.emplace_back(std::make_shared<CornellBox2>());
-    scenes.emplace_back(std::make_shared<MaterialScene>());
-    scenes.emplace_back(std::make_shared<BlenderTest>());
-    scenes.emplace_back(std::make_shared<LightedCube>());
+    //scenes.emplace_back(std::make_shared<CornellBox>());
+    //scenes.emplace_back(std::make_shared<CornellBox2>());
+    //scenes.emplace_back(std::make_shared<MaterialScene>());
+    //scenes.emplace_back(std::make_shared<BlenderTest>());
+    //scenes.emplace_back(std::make_shared<LightedCube>());
     scenes.emplace_back(std::make_shared<ObjTest>());
+    scenes.emplace_back(std::make_shared<Bunny>());
 }
 
 void GLViewer::updateBuffer() {
