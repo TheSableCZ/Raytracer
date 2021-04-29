@@ -132,6 +132,8 @@ void ApplyACTechnique(SceneMgr &scene, int technique) {
     } else if (technique == 2) {
         scene.setAccelerationDS(std::make_unique<OctreeADS>());
         scene.prepare();
+
+        static_cast<OctreeADS &>(scene.getADSRef()).stats();
     } else {
         scene.prepare();
     }

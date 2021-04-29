@@ -227,7 +227,7 @@ void GLViewer::initScenes() {
     //scenes.emplace_back(std::make_shared<MaterialScene>());
     //scenes.emplace_back(std::make_shared<BlenderTest>());
     //scenes.emplace_back(std::make_shared<LightedCube>());
-    scenes.emplace_back(std::make_shared<ObjTest>());
+    //scenes.emplace_back(std::make_shared<ObjTest>());
     scenes.emplace_back(std::make_shared<Bunny>());
 }
 

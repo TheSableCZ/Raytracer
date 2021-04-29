@@ -7,8 +7,9 @@
 
 #include "../AccelerationDS.h"
 #include <array>
+#include <map>
 
-constexpr unsigned LEVEL_MAX = 4;
+constexpr unsigned LEVEL_MAX = 8;
 constexpr unsigned LIMIT_MAX = 10;
 
 class OctreeNode {
@@ -34,6 +35,22 @@ private:
     void insertToChild(const std::shared_ptr<SceneObject> &object);
 };
 
+class OctreeStats {
+public:
+    void createStats(const std::shared_ptr<OctreeNode> &root);
+    void printStats() const;
+    static void printHist(std::string title, const std::map<int, int> &hist);
+
+    std::map<int, int> histLevel = {};
+    std::map<int, int> histLeafObjCount= {};
+    std::map<int, int> histNodeChildCount = {};
+    unsigned objCount = 0;
+    unsigned nodeCount = 0;
+    unsigned reachLimitAndMaxLevelCount = 0;
+
+    unsigned somethingWrong = 0;
+};
+
 class OctreeADS : public AccelerationDS {
 public:
     void clear() override
@@ -51,6 +68,12 @@ public:
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override
     {
         return root->intersect(ray, tMin, tMax, intersection);
+    }
+
+    void stats() {
+        OctreeStats stats;
+        stats.createStats(root);
+        stats.printStats();
     }
 
 private:

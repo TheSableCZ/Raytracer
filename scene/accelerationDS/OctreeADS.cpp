@@ -5,6 +5,7 @@
 #include "OctreeADS.h"
 #include "../SceneObject.h"
 #include "../../common/MathUtils.h"
+#include <iostream>
 
 void OctreeADS::insert(const std::vector<std::shared_ptr<SceneObject>> &object) {
     AABB topLevel = {};
@@ -132,4 +133,52 @@ bool OctreeNode::intersect(const Ray &ray, float tMin, float tMax, Intersection 
     } else {
         return false;
     }
+}
+
+void OctreeStats::createStats(const std::shared_ptr<OctreeNode> &root) {
+    if (!root->limitReached) { // leaf
+        histLeafObjCount[root->objList.size()]++;
+        objCount += root->objList.size();
+        histLevel[root->level]++;
+        if (root->objList.size() > LIMIT_MAX) {
+            reachLimitAndMaxLevelCount++;
+        }
+
+        if (root->objList.size() > LIMIT_MAX && root->level < LEVEL_MAX) {
+            somethingWrong++;
+        }
+    } else {
+        unsigned cnt = 0;
+        for (const auto &child : root->children) {
+            if (child) {
+                createStats(child);
+                cnt++;
+            }
+        }
+        histNodeChildCount[cnt]++;
+    }
+    nodeCount++;
+}
+
+void OctreeStats::printStats() const {
+    std::cout << "---------------------------------------------------\n";
+    std::cout << "Octree Stats: \n";
+    std::cout << "---------------------------------------------------\n";
+    std::cout << "No Objects:  " << objCount << " in " << nodeCount << " octree nodes.\n";
+    std::cout << "Reach limit but level is max: " << reachLimitAndMaxLevelCount << std::endl;
+    std::cout << "Something wrong: " << somethingWrong << std::endl;
+
+    printHist("Tree level (histogram)", histLevel);
+    printHist("Objects in leaves (histogram)", histLeafObjCount);
+    printHist("Number of children in nodes (histogram)", histNodeChildCount);
+}
+
+void OctreeStats::printHist(std::string title, const std::map<int, int> &hist) {
+    std::cout << "---------------------------------------------------\n";
+    std::cout << title << std::endl;
+    std::cout << "---------------------------------------------------\n";
+    for (const auto &pair : hist) {
+        std::cout << "  " << pair.first << "\t:\t" << pair.second << std::endl;
+    }
+    std::cout << "---------------------------------------------------\n";
 }

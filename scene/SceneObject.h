@@ -51,6 +51,7 @@ public:
     void setMaterial(const std::shared_ptr<Material> &mat);
 
     void setAccelerationDS(std::unique_ptr<AccelerationDS> ds) { accelerationDS = std::move(ds); }
+    AccelerationDS &getADSRef() { return *accelerationDS; }
 
 protected:
     std::shared_ptr<Material> mat;
