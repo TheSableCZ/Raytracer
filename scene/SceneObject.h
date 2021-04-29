@@ -45,6 +45,7 @@ public:
     bool isLightSource() const { return isLeafNode() && mat != nullptr && mat->isLightSource; }
     bool hasAccelerationDS() { return accelerationDS != nullptr; }
     const std::vector<std::shared_ptr<SceneObject>> &getChildren() { return children; }
+    const AccelerationDS &getAccelerationDS() const { return *accelerationDS; }
 
     void addChild(const std::shared_ptr<SceneObject>& sceneObj);
     void addChildren(const std::vector<std::shared_ptr<SceneObject>>& sceneObjs);

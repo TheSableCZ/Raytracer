@@ -101,7 +101,7 @@ add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
         scene/accelerationDS/OctreeADS.cpp
     scene/AABB.h
     scene/AABB.cpp
-        )
+)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     target_link_libraries(${PROJECT_NAME} PUBLIC glm SDL2::SDL2-static GLEW::glew)

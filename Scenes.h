@@ -18,17 +18,18 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "scene/accelerationDS/AABBSimpleADS.h"
 #include "scene/accelerationDS/OctreeADS.h"
+#include "scene/accelerationDS/AABBBVH.h"
 
 class Scene {
 public:
-    virtual void createScene(SceneMgr &scene, int current_ac_technique) = 0;
+    virtual void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) = 0;
 
     virtual void gui(bool &needReset) = 0;
 };
 
 class SimpleScene : public Scene {
 public:
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         /* DEPRECATED
          *
         light = std::make_shared<SimpleMat>(glm::vec3(4));
@@ -120,7 +121,7 @@ void createCornellBox(SceneMgr &scene) {
     //scene.addChild(std::make_shared<Plane>(glm::vec3(0, 0, 1), glm::vec3(0, 0, 555), white));
 }
 
-void ApplyACTechnique(SceneMgr &scene, int technique) {
+void ApplyACTechnique(SceneMgr &scene, int technique, int bvh_leaf_node_capacity) {
     if (technique == 1) { // AABBSimpleADS
         for (const auto &child : scene.getChildren()) {
             if (!child->isLeafNode() && !child->hasAccelerationDS()) {
@@ -132,13 +133,16 @@ void ApplyACTechnique(SceneMgr &scene, int technique) {
     } else if (technique == 2) {
         scene.setAccelerationDS(std::make_unique<OctreeADS>());
         scene.prepare();
+    } else if (technique == 3) {
+        scene.setAccelerationDS(std::make_unique<AABBBVH>(bvh_leaf_node_capacity));
+        scene.prepare();
     } else {
         scene.prepare();
     }
 }
 
 class CornellBox : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         createCornellBox(scene);
 
         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.6f, .6f, 1.f), .02f);
@@ -154,14 +158,14 @@ class CornellBox : public Scene {
 
         box->transform(matrix);
         scene.addChild(box);
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class CornellBox2 : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         createCornellBox(scene);
 
         auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.4f, .1f, 6.f), .2f);
@@ -174,14 +178,14 @@ class CornellBox2 : public Scene {
         scene.addChild(std::make_shared<Sphere>(glm::vec3(400, 110, 40), 80, bssrdf));
         scene.addChild(std::make_shared<Sphere>(glm::vec3(170, 80, 150), 80, glass));
 
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class MaterialScene : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         AppSettings::backgroundColor = glm::vec3(0.7f, 0.8f, 1.f);
         AppSettings::lookfrom = glm::vec3(0, 15, 50);
         AppSettings::lookat = glm::vec3(0, 5, 0);
@@ -213,14 +217,14 @@ class MaterialScene : public Scene {
         box->transform(matrix);
         scene.addChild(box);
 
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
     }
 
     void gui(bool &needReset) override {}
 };
 
 class BlenderTest : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         AppSettings::backgroundColor = glm::vec3(0.051f, 0.051f, 0.051f);
         AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
         AppSettings::lookat = glm::vec3(0, 0, 0);
@@ -254,7 +258,7 @@ class BlenderTest : public Scene {
 
         scene.addChild(box);
 
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
     }
 
     void gui(bool &needReset) override {}
@@ -262,7 +266,7 @@ class BlenderTest : public Scene {
 
 
 class LightedCube : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         AppSettings::lookfrom = glm::vec3(3, 3, 3);
         // AppSettings::lookfrom = glm::vec3(-4, 1, 4);
         //AppSettings::lookfrom = glm::vec3(-9.92579, 10, 10.35889);
@@ -284,7 +288,7 @@ class LightedCube : public Scene {
         });
 
         scene.addChildren(meshes);
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
     }
 
     void gui(bool &needReset) override {}
@@ -292,7 +296,7 @@ class LightedCube : public Scene {
 
 
 class ObjTest : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         //AppSettings::lookfrom = glm::vec3(-6.92579, 4.95831, 7.35889);
         //AppSettings::lookfrom = glm::vec3(-3, 3, 3);
         AppSettings::lookfrom = glm::vec3(1.2, 2.2, 3.7);
@@ -319,7 +323,7 @@ class ObjTest : public Scene {
 
         //auto meshes = ObjLoader::loadFromFile("cruiser.obj", red, mats);
         // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3(.6f, 1.0f, 0.3f), 0.5f);
-        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1.0f, .7f, 0.5f), 1/0.5f);
+        // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1.0f, .7f, 0.5f), 1/0.5f);
 
         auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
@@ -341,7 +345,7 @@ class ObjTest : public Scene {
 
         //scene.addSceneObject(std::make_shared<Plane>(glm::vec3(0, 1.f, 0), glm::vec3(0, -1.f, 0), white));
 
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
 
     }
 
@@ -349,7 +353,7 @@ class ObjTest : public Scene {
 };
 
 class Bunny : public Scene {
-    void createScene(SceneMgr &scene, int current_ac_technique) override {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
         AppSettings::lookfrom = glm::vec3(3, 3, 3);
         AppSettings::lookat = glm::vec3(0, 1, 0.2);
         AppSettings::aperture = 0.f;
@@ -360,24 +364,24 @@ class Bunny : public Scene {
 
         //auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         //auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
-        //auto glass = std::make_shared<Dielectric>(1.5);
+        auto glass = std::make_shared<Dielectric>(1.5);
         //auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.3f);
         //auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (1, 1, 1), glm::vec3(1/1.f, 1/0.2f, 1/0.1f));
-        auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (.2f, .8f, .2f), glm::vec3(0.02f));
+        // auto bssrdf = std::make_shared<BSSRDF>(glm::vec3 (.2f, .8f, .2f), glm::vec3(0.02f));
 
         auto redMat = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
         auto orangeMat = std::make_shared<Lambertian>(glm::vec3(0.3, .3, .6));
         auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
         lightMat->isLightSource = true;
 
-        auto meshes = ObjLoader::loadFromFile(RESOURCE_BUNNY_SCENE, redMat, {
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_BUNNY_SCENE, glass, {
                 {"Material.001", lightMat},
                 {"Material.003", orangeMat},
         });
 
         scene.addChildren(meshes);
 
-        ApplyACTechnique(scene, current_ac_technique);
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
 
     }
 

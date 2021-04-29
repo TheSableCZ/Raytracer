@@ -1,4 +1,5 @@
 
+#include "../SceneObject.h"
 #include "AABBBVH.h"
 #include <glm/gtx/component_wise.hpp>
 
@@ -12,12 +13,12 @@ AABBBVH_node::AABBBVH_node(NodeArray children)
     : children(move(children))
 {
     // build aabb from
-    if (!children.empty()) {
-        bb = children.front()->getBB();
-        auto it = children.begin();
-        std::advance(it, 1);
-        for (; it != children.end(); ++it) {
-            bb.combine((*it)->getBB());
+    if (!this->children.empty()) {
+        bb = this->children.front()->getBB();
+        auto it = this->children.begin();
+        ++it;
+        for (; it != this->children.end(); ++it) {
+            bb = bb + (*it)->getBB();
         }
     }
 }
@@ -27,7 +28,6 @@ AABBBVH_node::AABBBVH_node(const std::shared_ptr<SceneObject> &obj)
 {
 }
 
-
 int AABBBVH_node::buildTree(int leafCapacity, int level) {
     int depth = 0;
     if (children.size() > leafCapacity) {
@@ -35,6 +35,9 @@ int AABBBVH_node::buildTree(int leafCapacity, int level) {
         for (const auto &child : children) {
             depth = max(child->buildTree(leafCapacity, level + 1), depth);
         }
+    } else if (children.size() == 1) {
+        obj = children[0]->getObj();
+        children.clear();
     }
     return level + depth;
 }
@@ -88,6 +91,29 @@ NodeArray AABBBVH_node::getLeaves() const {
     return res; // hopefully return -optimized
 }
 
+bool AABBBVH_node::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
+    if (!bb.isIntersecting(ray, tMin, tMax)) {
+        return false;
+    }
+
+    if (isLeaf()) {
+        return obj->intersect(ray, tMin, tMax, intersection);
+    }
+
+    // check children
+    Intersection closestIntersection;
+    auto intersected = false;
+    auto closestSoFar = tMax;
+    for (auto& child : children) {
+        if (child->intersect(ray, tMin, closestSoFar, closestIntersection)) {
+            intersected = true;
+            closestSoFar = closestIntersection.t;
+            intersection = closestIntersection;
+        }
+    }
+    return intersected;
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 // AABBBVH implementation
 /////////////////////////////////////////////////////////////////////////////////
@@ -100,23 +126,10 @@ void AABBBVH::insert(const std::vector<std::shared_ptr<SceneObject>> &objects) {
             return make_shared<AABBBVH_node>(c);
         }
     );
-    rootNode.buildTree(leafCapacity);
+    rootNode = AABBBVH_node(move(nodes));
+    treeDepth = rootNode.buildTree(leafCapacity);
 };
 
-void AABBBVH::buildOver(const std::vector<std::shared_ptr<SceneObject>> &objects) {
-
-    NodeArray nodes;
-
-    // create nodes from objects
-    std::transform(objects.begin(), objects.end(), std::back_inserter(nodes),
-        [](const std::shared_ptr<SceneObject> &c) -> shared_ptr<AABBBVH_node> {
-            return make_shared<AABBBVH_node>(c);
-        }
-    );
-
-    rootNode = AABBBVH_node(move(nodes));
-}
-
-bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
-    return false;
+bool AABBBVH::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {
+    return rootNode.intersect(ray, tMin, tMax, intersection);
 }

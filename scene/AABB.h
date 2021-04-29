@@ -3,7 +3,6 @@
 //
 #pragma once
 
-
 #include <glm/glm.hpp>
 
 class Ray;
@@ -11,11 +10,11 @@ class Ray;
 // Quick workaround the fact that BB has to have at least some volume.
 // this treshold value defines minimal width of AABB in one dimension and
 // it should be set to minimal possible value. Current value is way too large, but works.
-#define MINIMAL_WIDTH 0.01f
-#define SET_MIN_WIDTH(coord) \
+#define MINIMAL_WIDTH 0.001f
+#define SET_MIN_WIDTH(coord)                                     \
     if (std::abs(minPos.coord - maxPos.coord) < MINIMAL_WIDTH) { \
-        minPos.coord -= MINIMAL_WIDTH * 0.5f; \
-        maxPos.coord += MINIMAL_WIDTH * 0.5f; \
+        minPos.coord -= MINIMAL_WIDTH * 0.5f;                    \
+        maxPos.coord += MINIMAL_WIDTH * 0.5f;                    \
     }
 
 /**
@@ -32,10 +31,6 @@ struct AABB {
     glm::vec3 minPos = glm::vec3(FLT_MAX);
     glm::vec3 maxPos = glm::vec3(-FLT_MAX);
 
-    inline AABB combine(const AABB& val) const {
-        return AABB(glm::min(minPos, val.minPos), glm::max(maxPos, val.maxPos));
-    }
-
     bool isIntersecting(const Ray &ray, float tMin, float tMax);
 
     bool bbInside(const AABB &aabb) const {
@@ -44,3 +39,7 @@ struct AABB {
             && glm::all(glm::greaterThanEqual(maxPos, aabb.minPos));
     }
 };
+
+inline AABB operator+(const AABB& a, const AABB& b) {
+    return AABB(glm::min(a.minPos, b.minPos), glm::max(a.maxPos, b.maxPos));
+}

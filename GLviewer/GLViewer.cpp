@@ -114,15 +114,42 @@ void GLViewer::run() {
 
         ImGui::Separator();
 
-        const char* items[] = { "Linear", "SimpleAABB 1 LvL", "Octree" };
-        ImGui::Text("Acceleration technique:");
-        ImGui::ListBox("###3", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+        {
+            const char* items[] = { "Linear", "SimpleAABB 1 LvL", "Octree", "AABBBVH" };
+            ImGui::Text("Acceleration technique:");
+            ImGui::ListBox("###3", &current_ac_technique, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
+
+            // wery dirty way to include some control for concrete ADS
+            if (current_ac_technique == IM_ARRAYSIZE(items) - 1) {
+                try {
+                    auto ds = dynamic_cast<const AABBBVH &>(raytracer->scene()->getAccelerationDS());
+                    auto prevCap = bvh_leaf_node_capacity;
+                    ImGui::Text("ActBVH tree depth: %d", ds.getDepth());
+                    ImGui::Text("Node Capacity:");
+                    ImGui::SliderInt("###node_capacity", &bvh_leaf_node_capacity, 2, 100);
+                    neednewScene = ds.getLeafCapacity() != bvh_leaf_node_capacity;
+                } catch (const std::bad_cast& e) {
+                    // nope
+                }
+            }
+        }
 
         ImGui::Separator();
 
-        if (ImGui::Button("Next scene")) {
-            selectedScene = (selectedScene + 1) % (scenes.size());
+        // quicker scene selection
+        {
+            const char* items[] = { "CornellBox", "CornellBox2", "MaterialScene", "BlenderTest", "LightedCube", "ObjTest", "Bunny" };
+            ImGui::Text("Scene:");
+            ImGui::ListBox("###4", &selectedScene, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
         }
+
+        // if (ImGui::Button("Next scene")) {
+        //     selectedScene = (selectedScene + 1) % (scenes.size());
+        // }
+
+        ImGui::Separator();
+
+
         ImGui::SameLine();
         if (ImGui::Button("Reset raytracing")) {
             needReset = true;
@@ -175,7 +202,7 @@ void GLViewer::render() {
 
         renderedSamples++;
 
-        if (_selectedScene != selectedScene || _current_ac_technique != current_ac_technique) {
+        if (_selectedScene != selectedScene || _current_ac_technique != current_ac_technique || neednewScene) {
             initSelectedScene();
             needReset = true;
         }
@@ -225,11 +252,11 @@ void GLViewer::initGLObjects() {
 
 void GLViewer::initScenes() {
     // scenes.emplace_back(std::make_shared<SimpleScene>());
-    //scenes.emplace_back(std::make_shared<CornellBox>());
-    //scenes.emplace_back(std::make_shared<CornellBox2>());
-    //scenes.emplace_back(std::make_shared<MaterialScene>());
-    //scenes.emplace_back(std::make_shared<BlenderTest>());
-    //scenes.emplace_back(std::make_shared<LightedCube>());
+    scenes.emplace_back(std::make_shared<CornellBox>());
+    scenes.emplace_back(std::make_shared<CornellBox2>());
+    scenes.emplace_back(std::make_shared<MaterialScene>());
+    scenes.emplace_back(std::make_shared<BlenderTest>());
+    scenes.emplace_back(std::make_shared<LightedCube>());
     scenes.emplace_back(std::make_shared<ObjTest>());
     scenes.emplace_back(std::make_shared<Bunny>());
 }
@@ -286,7 +313,7 @@ GLViewer::~GLViewer() {
 void GLViewer::initSelectedScene() {
     raytracer->clearScene();
     prepareTime = Measurement();
-    scenes[selectedScene]->createScene(*raytracer->scene(), current_ac_technique);
+    scenes[selectedScene]->createScene(*raytracer->scene(), current_ac_technique, bvh_leaf_node_capacity);
     actPrimitiveCount = raytracer->scene()->countPrimitives();
     prepareTime.stop();
 }

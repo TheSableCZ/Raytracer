@@ -8,7 +8,7 @@
 #include "../AccelerationDS.h"
 #include <array>
 
-constexpr unsigned LEVEL_MAX = 4;
+constexpr unsigned LEVEL_MAX = 8;
 constexpr unsigned LIMIT_MAX = 10;
 
 class OctreeNode {
