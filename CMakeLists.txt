@@ -95,6 +95,8 @@ add_executable(${PROJECT_NAME} ${IMGUI} ${OBJLOAD}
         scene/accelerationDS/LinearADS.cpp
         scene/accelerationDS/AABBSimpleADS.h
         scene/accelerationDS/AABBSimpleADS.cpp
+        scene/accelerationDS/AABBBVH.h
+        scene/accelerationDS/AABBBVH.cpp
     scene/AABB.h
     scene/AABB.cpp
 )

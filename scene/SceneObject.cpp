@@ -88,3 +88,14 @@ void SceneObject::setMaterial(const std::shared_ptr<Material> &mat) {
         child->setMaterial(mat);
     }
 }
+
+unsigned long SceneObject::countPrimitives() const {
+    if (isLeafNode()) {
+        return 1;
+    }
+    unsigned long resCount = 0;
+    for (const auto &child : children) {
+        resCount += child->countPrimitives();
+    }
+    return resCount;
+}

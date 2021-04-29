@@ -75,7 +75,9 @@ void GLViewer::run() {
         ImGui::Begin("Raytracer");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
-        { // statistics
+
+        {
+            // statistics
             std::vector<float> samples;
             samples.resize(RenderStatistics::HISTORY_LEN, 0.0f);
             int histIndex = RenderStatistics::HISTORY_LEN - 1;
@@ -91,6 +93,7 @@ void GLViewer::run() {
             ImGui::Text("Last sample time: %g s", statistic.getLastSecods());
             ImGui::Text("Average time: %g s", statistic.getAverageTime());
             ImGui::Text("Scene prepare time = %g s", prepareTime.finished ? prepareTime.getSeconds() : 0);
+            ImGui::Text("Number of primitives = %lu", actPrimitiveCount);
             ImGui::Separator();
         }
 
@@ -283,5 +286,6 @@ void GLViewer::initSelectedScene() {
     raytracer->clearScene();
     prepareTime = Measurement();
     scenes[selectedScene]->createScene(*raytracer->scene(), current_ac_technique);
+    actPrimitiveCount = raytracer->scene()->countPrimitives();
     prepareTime.stop();
 }
