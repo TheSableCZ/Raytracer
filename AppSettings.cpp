@@ -29,3 +29,5 @@ float AppSettings::vfov = 40.0;
 bool AppSettings::debug_showNormals = false;
 bool AppSettings::debug_showFrontSides = false;
 bool AppSettings::debug_sampleOnlyLights = false;
+
+int AppSettings::AABBBVH_max_treeDepth = -1;

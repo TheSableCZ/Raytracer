@@ -32,6 +32,9 @@ public:
     static bool debug_showNormals;
     static bool debug_showFrontSides;
     static bool debug_sampleOnlyLights;
+
+    // AccelerationDS settins
+    static int AABBBVH_max_treeDepth; // < 1 je neomezeno
 };
 
 #endif //RAYTRACER_APPSETTINGS_H

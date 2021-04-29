@@ -2,6 +2,7 @@
 #include "../SceneObject.h"
 #include "AABBBVH.h"
 #include <glm/gtx/component_wise.hpp>
+#include "../../AppSettings.h"
 
 using namespace std;
 
@@ -29,17 +30,22 @@ AABBBVH_node::AABBBVH_node(const std::shared_ptr<SceneObject> &obj)
 }
 
 int AABBBVH_node::buildTree(int leafCapacity, int level) {
-    int depth = 0;
-    if (children.size() > leafCapacity) {
+    int depth = level;
+    if (children.size() > leafCapacity
+        && (
+            AppSettings::AABBBVH_max_treeDepth < 0 ||
+            level < AppSettings::AABBBVH_max_treeDepth
+        )
+    ) {
         split();
         for (const auto &child : children) {
-            depth = max(child->buildTree(leafCapacity, level + 1), depth);
+            depth = std::max(child->buildTree(leafCapacity, level + 1), depth);
         }
     } else if (children.size() == 1) {
         obj = children[0]->getObj();
         children.clear();
     }
-    return level + depth;
+    return depth;
 }
 
 void AABBBVH_node::split() {
