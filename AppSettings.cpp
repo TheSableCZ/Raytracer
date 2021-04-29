@@ -36,3 +36,5 @@ int AppSettings::samplesLimit = -1;
 
 int AppSettings::treeLevelMax = 8;
 int AppSettings::treeLeafLimit = 10;
+
+int AppSettings::AABBBVH_max_treeDepth = -1;

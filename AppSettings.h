@@ -39,6 +39,9 @@ public:
 
     static int treeLevelMax;
     static int treeLeafLimit;
+
+    // AccelerationDS settins
+    static int AABBBVH_max_treeDepth; // < 1 je neomezeno
 };
 
 #endif //RAYTRACER_APPSETTINGS_H
