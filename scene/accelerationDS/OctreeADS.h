@@ -9,8 +9,8 @@
 #include <array>
 #include <map>
 
-constexpr unsigned LEVEL_MAX = 8;
-constexpr unsigned LIMIT_MAX = 10;
+//constexpr unsigned LEVEL_MAX = 8;
+//constexpr unsigned LIMIT_MAX = 10;
 
 class OctreeNode {
 public:

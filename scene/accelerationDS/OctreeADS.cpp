@@ -5,6 +5,7 @@
 #include "OctreeADS.h"
 #include "../SceneObject.h"
 #include "../../common/MathUtils.h"
+#include "../../AppSettings.h"
 #include <iostream>
 
 void OctreeADS::insert(const std::vector<std::shared_ptr<SceneObject>> &object) {
@@ -65,7 +66,7 @@ void OctreeNode::insert(const std::shared_ptr<SceneObject> &object) {
     if (!limitReached) {
         objList.emplace_back(object);
 
-        if (level < LEVEL_MAX && objList.size() >= LIMIT_MAX) {
+        if (level < AppSettings::treeLevelMax && objList.size() >= AppSettings::treeLeafLimit) {
             limitReached = true;
             for (const auto &obj : objList) {
                 insertToChild(obj);
@@ -140,11 +141,11 @@ void OctreeStats::createStats(const std::shared_ptr<OctreeNode> &root) {
         histLeafObjCount[root->objList.size()]++;
         objCount += root->objList.size();
         histLevel[root->level]++;
-        if (root->objList.size() > LIMIT_MAX) {
+        if (root->objList.size() > AppSettings::treeLeafLimit) {
             reachLimitAndMaxLevelCount++;
         }
 
-        if (root->objList.size() > LIMIT_MAX && root->level < LEVEL_MAX) {
+        if (root->objList.size() > AppSettings::treeLeafLimit && root->level < AppSettings::treeLevelMax) {
             somethingWrong++;
         }
     } else {

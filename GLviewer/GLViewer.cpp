@@ -65,6 +65,10 @@ void GLViewer::run() {
             }
         }
 
+        if (AppSettings::samplesLimit > -1 && renderedSamples >= (AppSettings::samplesLimit - 1)) {
+            running = false;
+        }
+
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
@@ -308,6 +312,8 @@ std::vector<unsigned char> GLViewer::pixelsToTextureData() const {
 
 GLViewer::~GLViewer() {
     workingThread->join();
+    std::cout << "Rendered samples: " << renderedSamples << std::endl;
+    statistic.saveToFile("stats.txt");
 }
 
 void GLViewer::initSelectedScene() {
