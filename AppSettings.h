@@ -33,6 +33,13 @@ public:
     static bool debug_showFrontSides;
     static bool debug_sampleOnlyLights;
 
+    static int defaultScene;
+    static int defaultAccelerationDS;
+    static int samplesLimit;
+
+    static int treeLevelMax;
+    static int treeLeafLimit;
+
     // AccelerationDS settins
     static int AABBBVH_max_treeDepth; // < 1 je neomezeno
 };

@@ -43,12 +43,13 @@ public:
     void end();
 
     void reset() { data.clear(); }
-    float getLastSecods() { return lastDuration; }
-    float getSampleCount() { return data.size(); }
-    float getAverageTime() { return averageTime; }
+    float getLastSecods() const { return lastDuration; }
+    float getSampleCount() const { return data.size(); }
+    float getAverageTime() const { return averageTime; }
     bool isMeasuring() { return !data.back().finished; }
     const std::vector<Measurement> &getData() { return data; }
     void resetAverage() { averageTime = 0.0f; averageCounting = 0;}
+    void saveToFile(const std::string &filename) const;
 
 private:
     std::vector<Measurement> data;

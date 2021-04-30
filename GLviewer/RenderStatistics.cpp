@@ -3,6 +3,8 @@
 //
 
 #include "RenderStatistics.h"
+#include <string>
+#include <fstream>
 
 void RenderStatistics::start() {
     end();
@@ -22,4 +24,18 @@ void RenderStatistics::accountMeasurement(float seconds) {
         ? averageTime + ((seconds - averageTime) / float(averageCounting))
         : seconds;
     ++averageCounting;
+}
+
+void RenderStatistics::saveToFile(const std::string &filename) const {
+    std::ofstream file;
+    file.open(filename);
+
+    file << getAverageTime() << std::endl;
+    file << getSampleCount() << std::endl;
+
+    /*for (const auto &item : data) {
+        file << item.getSeconds() << std::endl;
+    }*/
+
+    file.close();
 }
