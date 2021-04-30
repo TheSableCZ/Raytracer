@@ -390,4 +390,39 @@ class Bunny : public Scene {
     void gui(bool &needReset) override {}
 };
 
+class Dyno : public Scene {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
+        AppSettings::lookfrom = glm::vec3(26.0, 1.5, -4.0);
+        AppSettings::lookat = glm::vec3(2, 7.0, -4.5);
+        AppSettings::vfov = 33.0f;
+        AppSettings::aperture = 0.f;
+        AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        AppSettings::backgroundColor = glm::vec3 (0.f);
+
+        scene.camera().init();
+
+        auto groundMat = std::make_shared<Lambertian>(glm::vec3(0.000000, 0.010018, 0.044434));
+        auto walllMat = std::make_shared<Lambertian>(glm::vec3(0.538225, 0.482123, 0.513181));
+        auto dynoMat = std::make_shared<Lambertian>(glm::vec3(0.345588/3.0, 0.007566/3.0, 0.012217/3.0));
+        auto lampMat = std::make_shared<Metal>(glm::vec3(0.595588, 0.595588, 0.595588), 0.5);
+        auto lightMat = std::make_shared<SimpleMat>(glm::vec3(500));
+        lightMat->isLightSource = true;
+
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_DYNO, walllMat, {
+                {"groundMat", groundMat},
+                {"dynoMat", dynoMat},
+                {"lampMat", lampMat},
+                {"lightMat", lightMat},
+        });
+
+        scene.addChildren(meshes);
+
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
+
+    }
+
+    void gui(bool &needReset) override {}
+};
+
+
 #endif //RAYTRACER_SCENES_H

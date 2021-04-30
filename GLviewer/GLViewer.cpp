@@ -138,7 +138,7 @@ void GLViewer::run() {
 
         // quicker scene selection
         {
-            const char* items[] = { "CornellBox", "CornellBox2", "MaterialScene", "BlenderTest", "LightedCube", "ObjTest", "Bunny" };
+            const char* items[] = { "CornellBox", "CornellBox2", "MaterialScene", "BlenderTest", "LightedCube", "ObjTest", "Bunny", "Dyno" };
             ImGui::Text("Scene:");
             ImGui::ListBox("###4", &selectedScene, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
         }
@@ -259,6 +259,7 @@ void GLViewer::initScenes() {
     scenes.emplace_back(std::make_shared<LightedCube>());
     scenes.emplace_back(std::make_shared<ObjTest>());
     scenes.emplace_back(std::make_shared<Bunny>());
+    scenes.emplace_back(std::make_shared<Dyno>());
 }
 
 void GLViewer::updateBuffer() {
