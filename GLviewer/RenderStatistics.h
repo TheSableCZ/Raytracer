@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <chrono>
+#include <string>
 
 struct Measurement {
 

@@ -3,7 +3,6 @@
 //
 
 #include "RenderStatistics.h"
-#include <string>
 #include <fstream>
 
 void RenderStatistics::start() {
