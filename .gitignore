@@ -7,3 +7,5 @@ imgui.ini
 *.ppm
 *.blend1
 venv/
+data/
+*.png

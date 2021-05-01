@@ -13,6 +13,7 @@ void args(int argc, char **argv) {
     }
     if (argc > 4) {
         AppSettings::treeLevelMax = std::stoi(argv[4]);
+        AppSettings::AABBBVH_max_treeDepth = std::stoi(argv[4]);
     }
     if (argc > 5) {
         AppSettings::treeLeafLimit = std::stoi(argv[5]);
