@@ -21,13 +21,16 @@ public:
 
     bool intersect(const Ray &ray, Intersection &intersection);
     Camera& camera() { return _camera; }
-    std::shared_ptr<SceneObjsPdf> getLightPdf(const glm::vec3 &origin) const;
+    std::shared_ptr<SceneObjsPdf> getLightPdf() const;
     inline unsigned lightSourcesCount() const { return lightSources.size(); }
     void prepare() override;
+    void setLightAccelerationDS(std::unique_ptr<AccelerationDS> ds) { lightAccelerationDS = std::move(ds); }
 
 private:
     Camera _camera;
     std::vector<std::shared_ptr<SceneObject>> lightSources;
+    std::shared_ptr<SceneObjsPdf> lightPdf;
+    std::unique_ptr<AccelerationDS> lightAccelerationDS;
 };
 
 

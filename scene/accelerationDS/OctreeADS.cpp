@@ -136,6 +136,33 @@ bool OctreeNode::intersect(const Ray &ray, float tMin, float tMax, Intersection 
     }
 }
 
+float OctreeNode::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+    Ray ray(origin, v);
+    if (bb.isIntersecting(ray, AppSettings::tMin, AppSettings::tMax)) {
+
+        if (!limitReached) {
+            float res = 0.f;
+            for (const auto& object : objList) {
+                res += object->pdfValue(origin, v);
+            }
+            return res;
+
+        } else {
+            float res = 0.f;
+            for (const auto &node : children) {
+                if (node) {
+                    res += node->pdfValue(origin, v);
+                }
+            }
+
+            return res;
+        }
+
+    } else {
+        return 0.f;
+    }
+}
+
 void OctreeStats::createStats(const std::shared_ptr<OctreeNode> &root) {
     if (!root->limitReached) { // leaf
         histLeafObjCount[root->objList.size()]++;

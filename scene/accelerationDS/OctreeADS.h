@@ -19,6 +19,7 @@ public:
 
     void insert(const std::shared_ptr<SceneObject> &object);
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection);
+    float pdfValue(const glm::vec3 &origin, const glm::vec3 &v);
 
     AABB bb;
     glm::vec3 center, halfSize;
@@ -68,6 +69,11 @@ public:
     bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override
     {
         return root->intersect(ray, tMin, tMax, intersection);
+    }
+
+    float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override
+    {
+        return root->pdfValue(origin, v);
     }
 
     void stats() {

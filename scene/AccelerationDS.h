@@ -25,4 +25,5 @@ public:
     };
 
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) = 0;
+    virtual float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) { return 0.0; }
 };
