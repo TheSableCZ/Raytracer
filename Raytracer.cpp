@@ -66,19 +66,19 @@ inline glm::vec3 Raytracer::calculateScatteredRay(
                 && scatterInfo.scatteredRayType != ScatteredRayType::BSSRDF_insideMedium
                 )
         {
-            p = std::make_shared<MixturePdf>(scatterInfo.pdfPtr, scene()->getLightPdf(scatterInfo.rayOrigin));
+            p = std::make_shared<MixturePdf>(scatterInfo.pdfPtr, scene()->getLightPdf());
         } else {
             p = scatterInfo.pdfPtr;
         }
 
 #ifndef NDEBUG
         if (AppSettings::debug_sampleOnlyLights) {
-            p = scene()->getLightPdf(scatterInfo.rayOrigin);
+            p = scene()->getLightPdf();
         }
 #endif
 
-        Ray scattered = Ray(scatterInfo.rayOrigin, p->generate());
-        auto pdfValue = p->value(scattered.direction);
+        Ray scattered = Ray(scatterInfo.rayOrigin, p->generate(scatterInfo.rayOrigin));
+        auto pdfValue = p->value(scattered.direction, scatterInfo.rayOrigin);
 
         return scatterInfo.attenuation * intersection.materialPtr->scatteringPdf(inRay, intersection, scattered, scatterInfo)
                * trace(scattered, depth - 1, colorChannel)

@@ -16,10 +16,12 @@ struct Vertex {
 class Polygon : public SceneObject {
 public:
     Polygon(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
-        : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), verticesWithNormal(false) {}
+        : SceneObject(), p1(p1, glm::vec3(0)), p2(p2, glm::vec3(0)), p3(p3, glm::vec3(0)), verticesWithNormal(false)
+        { bb = computeAABB(); }
 
     Polygon(Vertex p1, Vertex p2, Vertex p3)
-        : SceneObject(), p1(p1), p2(p2), p3(p3), verticesWithNormal(true) {}
+        : SceneObject(), p1(p1), p2(p2), p3(p3), verticesWithNormal(true)
+        { bb = computeAABB(); }
 
     void translate(glm::vec3 trVec) {
         transform(glm::translate(glm::mat4(1.f), trVec));
@@ -28,6 +30,8 @@ public:
     void scale(glm::vec3 scVec) {
         transform(glm::scale(glm::mat4(1.f), scVec));
     }
+
+    AABB computeAABB() const;
 
     // overrides
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
@@ -41,6 +45,7 @@ private:
     Vertex p2;
     Vertex p3;
     bool verticesWithNormal;
+    AABB bb;
 };
 
 /*

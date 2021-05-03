@@ -63,11 +63,16 @@ void Polygon::transform(const glm::mat4& matrix) {
 
     tmp_4 = matrix * glm::vec4 (p3.p, 1.f);
     p3.p = glm::vec3 (tmp_4 / tmp_4.w);
+
+    bb = computeAABB();
 }
 
 float Polygon::pdfValue(const glm::vec3 &origin, const glm::vec3 &v)  {
     Intersection intersection;
-    if (!this->intersect(Ray(origin, v), AppSettings::tMin, AppSettings::tMax, intersection))
+    Ray r(origin, v);
+    if (!this->getAABB().isIntersecting(r, AppSettings::tMin, AppSettings::tMax))
+        return 0;
+    if (!this->intersect(r, AppSettings::tMin, AppSettings::tMax, intersection))
         return 0;
 
     auto area = length(cross(p2.p-p1.p, p3.p-p1.p)) * 0.5; //(x1-x0)*(z1-z0);
@@ -121,8 +126,16 @@ std::shared_ptr<SceneObject> createUnitBox(const std::shared_ptr<Material> &mat)
 }
 
 AABB Polygon::getAABB() const {
-    return AABB(
+    return bb;
+    /*return AABB(
         glm::min(p1.p, glm::min(p2.p, p3.p)),
         glm::max(p1.p, glm::max(p2.p, p3.p))
+    );*/
+}
+
+AABB Polygon::computeAABB() const {
+    return AABB(
+            glm::min(p1.p, glm::min(p2.p, p3.p)),
+            glm::max(p1.p, glm::max(p2.p, p3.p))
     );
 }

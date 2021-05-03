@@ -132,6 +132,7 @@ void ApplyACTechnique(SceneMgr &scene, int technique, int bvh_leaf_node_capacity
         scene.prepare();
     } else if (technique == 2) {
         scene.setAccelerationDS(std::make_unique<OctreeADS>());
+        scene.setLightAccelerationDS(std::make_unique<OctreeADS>());
         scene.prepare();
 
         static_cast<OctreeADS &>(scene.getADSRef()).stats();
@@ -365,6 +366,7 @@ class Bunny : public Scene {
         scene.camera().init();
 
         //auto red = std::make_shared<Lambertian>(glm::vec3(.65, .05, .05));
+        //auto blue = std::make_shared<Lambertian>(glm::vec3(.10, .20, .65));
         //auto white = std::make_shared<Lambertian>(glm::vec3(.73, .73, .73));
         auto glass = std::make_shared<Dielectric>(1.5);
         //auto metal = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.3f);
