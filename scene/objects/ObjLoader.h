@@ -45,7 +45,7 @@ std::vector<std::shared_ptr<SceneObject>> ObjLoader::loadFromFile(const std::str
 
             auto polyMesh = std::make_shared<SceneObject>();
 
-            for (int i = 0; i < curMesh.Indices.size(); i += 3) {
+            for (int i = 0; (i+2) < curMesh.Indices.size(); i += 3) {
                 int j1 = curMesh.Indices[i], j2 = curMesh.Indices[i+1], j3 = curMesh.Indices[i+2];
                 auto p1 = Vertex(vec3ToGlm3(curMesh.Vertices[j1].Position), vec3ToGlm3(curMesh.Vertices[j1].Normal));
                 auto p2 = Vertex(vec3ToGlm3(curMesh.Vertices[j2].Position), vec3ToGlm3(curMesh.Vertices[j2].Normal));

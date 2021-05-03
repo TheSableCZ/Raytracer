@@ -2,9 +2,7 @@ usemtl BookCover
 usemtl BookPaper
 usemtl Cabinet
 usemtl default
-usemtl Drawer_Holder
 usemtl DVD_Player
-usemtl Floor
 usemtl floorMat
 usemtl gorshok
 usemtl Guitar
@@ -33,12 +31,10 @@ usemtl Soundbar_Foam
 usemtl Soundbar_Speaker
 usemtl Soundbar_Speaker_2
 usemtl stem
-usemtl Table_Drawer
 usemtl Tea_Table_
 usemtl TV
 usemtl TVBacklight
 usemtl TVDisplay
-usemtl Wall
 usemtl Wall_Frame
 usemtl wall2Mat
 usemtl Water

@@ -30,8 +30,8 @@ bool AppSettings::debug_showNormals = false;
 bool AppSettings::debug_showFrontSides = false;
 bool AppSettings::debug_sampleOnlyLights = false;
 
-int AppSettings::defaultScene = 0;
-int AppSettings::defaultAccelerationDS = 0;
+int AppSettings::defaultScene = 8;
+int AppSettings::defaultAccelerationDS = 3;
 int AppSettings::samplesLimit = -1;
 
 int AppSettings::treeLevelMax = 8;

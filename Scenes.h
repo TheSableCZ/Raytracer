@@ -426,5 +426,64 @@ class Dyno : public Scene {
     void gui(bool &needReset) override {}
 };
 
+class Room : public Scene {
+    void createScene(SceneMgr &scene, int current_ac_technique, int bvh_leaf_node_capacity) override {
+        AppSettings::lookfrom = glm::vec3(11.0, 4.5, -0.2);
+        AppSettings::lookat = glm::vec3(0, 4.5, -0.2);
+        AppSettings::vfov = 55.0f;
+        AppSettings::aperture = 0.f;
+        AppSettings::distToFocus = glm::length(AppSettings::lookfrom-AppSettings::lookat);
+        AppSettings::backgroundColor = glm::vec3 (0.f);
+
+        scene.camera().init();
+
+
+        auto wall2Mat = std::make_shared<Lambertian>(glm::vec3(0.8, 0.6, 0.0));
+        auto floorMat = std::make_shared<Lambertian>(glm::vec3(0.111, 0.2, 0.8));
+        auto Tea_TableMat = std::make_shared<Dielectric>(2);
+        auto Sofa = std::make_shared<Lambertian>(glm::vec3(0.1, 0.1, 0.05));
+
+        auto phoneScreen = std::make_shared<Metal>(glm::vec3(0.6), 0.1);
+        auto Guitar = std::make_shared<Metal>(3.0f * glm::vec3(.2, 0.1, 0.01), 0.4);
+        auto Cabinet = std::make_shared<Metal>(glm::vec3(0.698191, 0.594057, 0.565871), 0.2);
+        auto BookCover = std::make_shared<Lambertian>(glm::vec3(0.548852, 0.01879, 0.006881));
+
+        auto leafMat = std::make_shared<Lambertian>(glm::vec3(0.013, 0.55, 0.013));
+        auto stem = std::make_shared<Lambertian>(glm::vec3(0.188, 0.55, 0.255));
+        auto gorshok = std::make_shared<Lambertian>(glm::vec3(0.576, 0.072, 0.003));
+        auto moh  = std::make_shared<Lambertian>(glm::vec3(0.0, 0.0, 0.0));
+        auto sand   = std::make_shared<Lambertian>(glm::vec3(0.128, 0.04, 0.01));
+
+        auto defaultMat = std::make_shared<Lambertian>(glm::vec3(1));
+        auto Wall_FrameMat = std::make_shared<Metal>(glm::vec3(0.7, 0.6, 1.f), 0.6f);
+        auto TVDisplayMat = std::make_shared<SimpleMat>(3.0f * glm::vec3(0.7,0.7, 1));
+        TVDisplayMat->isLightSource = true;
+
+        auto meshes = ObjLoader::loadFromFile(RESOURCE_ROOM, defaultMat, {
+                {"TVDisplay", TVDisplayMat},
+                {"Wall_Frame", Wall_FrameMat},
+                {"wall2Mat",  wall2Mat},
+                {"floorMat",  floorMat},
+                {"Tea_Table_", Tea_TableMat},
+                {"Material.002", phoneScreen},
+                {"Sofa", Sofa},
+                {"leaf.001", leafMat},
+                {"stem", stem},
+                {"gorshok", gorshok},
+                {"moh", moh},
+                {"sand", sand},
+                {"Guitar", Guitar},
+                {"Cabinet", Cabinet},
+                {"BookCover", BookCover}
+        });
+
+        scene.addChildren(meshes);
+
+        ApplyACTechnique(scene, current_ac_technique, bvh_leaf_node_capacity);
+
+    }
+
+    void gui(bool &needReset) override {}
+};
 
 #endif //RAYTRACER_SCENES_H
