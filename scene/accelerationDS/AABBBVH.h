@@ -14,6 +14,7 @@ struct AABBBVH_node {
 
     int buildTree(int leafCapacity, int level = 0);
     NodeArray getLeaves() const;
+    float pdfValue(const glm::vec3 &origin, const glm::vec3 &v);
 
     // to make it fairly immutable
     inline AABB getBB() const { return bb; }
@@ -47,6 +48,11 @@ public:
 
     virtual void insert(const std::vector<std::shared_ptr<SceneObject>> &objects) override;
     virtual bool intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) override;
+
+    float pdfValue(const glm::vec3 &origin, const glm::vec3 &v) override
+    {
+        return rootNode.pdfValue(origin, v);
+    }
 
     int getDepth() const { return treeDepth; }
     int getLeafCapacity() const { return leafCapacity; }

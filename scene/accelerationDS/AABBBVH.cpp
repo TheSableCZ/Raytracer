@@ -120,6 +120,25 @@ bool AABBBVH_node::intersect(const Ray &ray, float tMin, float tMax, Intersectio
     return intersected;
 }
 
+float AABBBVH_node::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
+    Ray ray(origin, v);
+    if (bb.isIntersecting(ray, AppSettings::tMin, AppSettings::tMax)) {
+        if (isLeaf()) {
+            return obj->pdfValue(origin, v);
+        } else {
+            float res = 0.f;
+            for (const auto &child : children) {
+                if (child) {
+                    res += child->pdfValue(origin, v);
+                }
+            }
+            return res;
+        }
+    } else {
+        return 0.f;
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 // AABBBVH implementation
 /////////////////////////////////////////////////////////////////////////////////
