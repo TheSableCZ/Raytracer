@@ -101,10 +101,10 @@ void GLViewer::run() {
             ImGui::Separator();
         }
 
-        ImGui::Text("Distance to focus:");
+        /*ImGui::Text("Distance to focus:");
         if (ImGui::InputFloat("###1", &AppSettings::distToFocus, 1.f)) {raytracer->scene()->camera().init(); needReset = true; }
         ImGui::Text("Aperture:");
-        if (ImGui::InputFloat("###2", &AppSettings::aperture, 0.1f)) { raytracer->scene()->camera().init(); needReset = true; }
+        if (ImGui::InputFloat("###2", &AppSettings::aperture, 0.1f)) { raytracer->scene()->camera().init(); needReset = true; }*/
 
         ImGui::Separator();
 
@@ -139,6 +139,13 @@ void GLViewer::run() {
                 AppSettings::treeLeafLimit = newCap;
                 neednewScene = true;
             }
+            ImGui::Text("Tree max depth:");
+            int newMax = AppSettings::treeLevelMax;
+            if (ImGui::SliderInt("###max_depth", &newMax, 2, 20)) {
+                AppSettings::treeLevelMax = newMax;
+                AppSettings::AABBBVH_max_treeDepth = newMax;
+                neednewScene = true;
+            }
         }
 
 
@@ -146,7 +153,7 @@ void GLViewer::run() {
 
         // quicker scene selection
         {
-            const char* items[] = { "CornellBox", "CornellBox2", "MaterialScene", "BlenderTest", "LightedCube", "ObjTest", "Bunny", "Dyno", "Room" };
+            const char* items[] = { "CornellBox", "CornellBox2", "MaterialScene", "BlenderTest", "LightedCube", "Cruiser", "Bunny", "Dyno", "Room" };
             ImGui::Text("Scene:");
             ImGui::ListBox("###4", &selectedScene, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items));
         }
