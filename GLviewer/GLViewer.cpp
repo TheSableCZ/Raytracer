@@ -109,11 +109,11 @@ void GLViewer::run() {
         ImGui::Separator();
 
         bool ambient = AppSettings::backgroundColor != glm::vec3 (0.f);
-        // ImGui::InputText("", filename, 30); ImGui::SameLine();
-        // if (ImGui::Button("Save")) { needSaveToFile = true; }
-        if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
+        ImGui::InputText("", filename, 30); ImGui::SameLine();
+        if (ImGui::Button("Save")) { needSaveToFile = true; }
+        //if (ImGui::Checkbox("Antialiasing", &AppSettings::antialiasing)) needReset = true;
         if (ImGui::Checkbox("Ambient light", &ambient)) { AppSettings::backgroundColor = ambient ? backgroundColor : glm::vec3 (0.f); needReset = true; }
-        if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
+        //if (ImGui::Checkbox("Use Monte Carlo", &AppSettings::useMC)) needReset = true;
         if (ImGui::Checkbox("Enable lights direct sampling", &AppSettings::lightsDirectSampling)) needReset = true;
 
         ImGui::Separator();
