@@ -12,7 +12,7 @@ struct AABBBVH_node {
     AABBBVH_node(NodeArray children = {});
     AABBBVH_node(const std::shared_ptr<SceneObject> &obj);
 
-    int buildTree(int leafCapacity, int level = 0);
+    int buildTree(int level = 0);
     NodeArray getLeaves() const;
     float pdfValue(const glm::vec3 &origin, const glm::vec3 &v);
 
@@ -36,7 +36,7 @@ private:
 class AABBBVH : public AccelerationDS {
 public:
 
-    AABBBVH(int leafCapacity = 2) : leafCapacity(leafCapacity) {}
+    AABBBVH(int leafCapacity = 2) {}
 
     virtual void clear() override {
         rootNode = AABBBVH_node(NodeArray{});
@@ -55,10 +55,8 @@ public:
     }
 
     int getDepth() const { return treeDepth; }
-    int getLeafCapacity() const { return leafCapacity; }
 
 protected:
     int treeDepth = 0;
-    int leafCapacity = 2;
     AABBBVH_node rootNode;
 };

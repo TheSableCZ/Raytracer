@@ -29,9 +29,9 @@ AABBBVH_node::AABBBVH_node(const std::shared_ptr<SceneObject> &obj)
 {
 }
 
-int AABBBVH_node::buildTree(int leafCapacity, int level) {
+int AABBBVH_node::buildTree(int level) {
     int depth = level;
-    if (children.size() > leafCapacity
+    if (children.size() > AppSettings::treeLeafLimit
         && (
             AppSettings::AABBBVH_max_treeDepth < 0 ||
             level < AppSettings::AABBBVH_max_treeDepth
@@ -39,7 +39,7 @@ int AABBBVH_node::buildTree(int leafCapacity, int level) {
     ) {
         split();
         for (const auto &child : children) {
-            depth = std::max(child->buildTree(leafCapacity, level + 1), depth);
+            depth = std::max(child->buildTree(level + 1), depth);
         }
     } else if (children.size() == 1) {
         obj = children[0]->getObj();
@@ -143,7 +143,6 @@ float AABBBVH_node::pdfValue(const glm::vec3 &origin, const glm::vec3 &v) {
 // AABBBVH implementation
 /////////////////////////////////////////////////////////////////////////////////
 
-
 void AABBBVH::insert(const std::vector<std::shared_ptr<SceneObject>> &objects) {
     NodeArray nodes = rootNode.getLeaves();
     std::transform(objects.begin(), objects.end(), std::back_inserter(nodes),
@@ -152,7 +151,7 @@ void AABBBVH::insert(const std::vector<std::shared_ptr<SceneObject>> &objects) {
         }
     );
     rootNode = AABBBVH_node(move(nodes));
-    treeDepth = rootNode.buildTree(leafCapacity);
+    treeDepth = rootNode.buildTree();
 };
 
 bool AABBBVH::intersect(const Ray &ray, float tMin, float tMax, Intersection &intersection) {

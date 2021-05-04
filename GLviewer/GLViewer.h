@@ -63,7 +63,6 @@ private:
     RenderStatistics statistic;
     Measurement prepareTime;
     unsigned long actPrimitiveCount = 0;
-    int bvh_leaf_node_capacity = 2;
 };
 
 std::string const vsSrc = R".(
