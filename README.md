@@ -1,6 +1,6 @@
 # RayTracer
 
-GitHub: https://github.com/TheSableCZ/Raytracer
+GitHub: https://github.com/TheSableCZ/Raytracer on branch `absolute-positions-scene`
 
 ## Dependencies:
 
@@ -34,6 +34,6 @@ Required files are:
 
 ## Installation
 
-This is a common cMake project:
+This is a common CMake project.
 
 Please note that is recommended to build in release mode for better performance.
